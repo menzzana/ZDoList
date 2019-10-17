@@ -79,7 +79,10 @@ class MainWindow : public QMainWindow {
     void closeEvent(QCloseEvent *event);
     void ShowContextMenu(const QPoint &pos,ToDo *todo);
 
-  private:
+    void on_actionAbout_triggered();
+
+    private:
+    const QString VERSION="0.1.0";
     const int MAXLABELWIDTHDIFF=10;
     const int MAXMAILBUTTONWIDTH=100;
     const int MAXPRIORITY=5;

@@ -43,8 +43,9 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="separator"/>
     <addaction name="actionPreferences"/>
-    <addaction name="actionAbut"/>
+    <addaction name="actionAbout"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -72,7 +73,7 @@
     <string>Preferences</string>
    </property>
   </action>
-  <action name="actionAbut">
+  <action name="actionAbout">
    <property name="text">
     <string>About</string>
    </property>

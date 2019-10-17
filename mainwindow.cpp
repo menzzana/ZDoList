@@ -131,6 +131,16 @@ void MainWindow::dropEvent(QDropEvent *event) {
   event->acceptProposedAction();
   }
 //------------------------------------------------------------------------------
+void MainWindow::on_actionAbout_triggered() {
+  QMessageBox msgbox;
+
+  msgbox.setWindowTitle("ZDoList");
+  msgbox.setText("ZDoList version "+QString(SOFTWARE_VERSION)+"-"+QString(GIT_VERSION));
+  msgbox.setStandardButtons(QMessageBox::Ok);
+  msgbox.exec();
+  msgbox.close();
+  }
+//------------------------------------------------------------------------------
 void MainWindow::dragEnterEvent(QDragEnterEvent *event) {
   //if (event->mimeData()->hasFormat("text/plain"))
   event->acceptProposedAction();
@@ -171,14 +181,6 @@ void MainWindow::ShowContextMenu(const QPoint &pos,ToDo *todo) {
       setPriority(todo);
       }
     );
-  if (!todo->url.isEmpty()) {
-    action=new QAction("Read mail",this);
-    menu->addAction(action);
-    connect(action,&QAction::triggered, [=] {
-        gotoMail(todo);
-        }
-      );
-    }
   menu->exec(this->mapToGlobal(pos));
   menu->close();
   }
