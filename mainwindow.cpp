@@ -136,6 +136,7 @@ void MainWindow::on_actionAbout_triggered() {
 
   msgbox.setWindowTitle("ZDoList");
   msgbox.setText("ZDoList version "+QString(SOFTWARE_VERSION)+"-"+QString(GIT_VERSION));
+  msgbox.setInformativeText("ZDoList is developed by Henric Zazzi");
   msgbox.setStandardButtons(QMessageBox::Ok);
   msgbox.exec();
   msgbox.close();
@@ -199,7 +200,7 @@ void MainWindow::preferences() {
   if (prefdialog.exec()==QDialog::Accepted) {
     todofilename=prefdialog.getFileName();
     mailsoftware=prefdialog.getSoftware();
-    QSettings settings(INI_FILENAME, QSettings::IniFormat);
+    QSettings settings(QDir::currentPath()+INI_FILENAME, QSettings::IniFormat);
     settings.setValue("ToDoFile",todofilename);
     settings.setValue("MailSoftware",mailsoftware);
     }
@@ -222,7 +223,7 @@ void MainWindow::checkEmptyToDoFile() {
   }
 //------------------------------------------------------------------------------
 void MainWindow::loadTasks() {
-  QSettings settings(INI_FILENAME, QSettings::IniFormat);
+  QSettings settings(QDir::currentPath()+INI_FILENAME, QSettings::IniFormat);
   todofilename=settings.value("ToDoFile","").toString();
   mailsoftware=settings.value("MailSoftware",0).toInt();
   if (todofilename.isEmpty())
@@ -299,13 +300,13 @@ void MainWindow::addToDo(ToDo *todo) {
     label=new QLabel();
     label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
     label->setText(setTextColor(QString(char(todo->priority+64)),"black"));
-    myLayout->addWidget(label,row,1,1,1);
+    myLayout->addWidget(label,row,2,1,1);
     }
   if (!todo->url.isEmpty()) {
     button=new QPushButton();
     button->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
     button->setText("Mail");
-    myLayout->addWidget(button,row,2,1,1);
+    myLayout->addWidget(button,row,1,1,1);
     connect(button,&QPushButton::clicked,[=] () {
         gotoMail(todo);
         }
@@ -342,11 +343,16 @@ void MainWindow::setProject(ToDo *todo) {
   QStringList stringlist;
   QString s1;
   ToDoTag *tdt1;
+  int idx,currentidx;
 
   stringlist << QString("None");
-  for (tdt1=project; tdt1!=nullptr; tdt1=tdt1->Next)
+  currentidx=0;
+  for (tdt1=project,idx=1; tdt1!=nullptr; tdt1=tdt1->Next,idx++) {
     stringlist << QString(tdt1->description);
-  s1=QInputDialog::getItem(this,"Set Project","Project",stringlist,0,false,&ok);
+    if (tdt1==todo->project)
+      currentidx=idx;
+    }
+  s1=QInputDialog::getItem(this,"Set Project","Project",stringlist,currentidx,false,&ok);
   if (ok) {
     todo->project=getEntry(project,s1);
     drawAllTasks();
@@ -358,11 +364,16 @@ void MainWindow::setContext(ToDo *todo) {
   QStringList stringlist;
   QString s1;
   ToDoTag *tdt1;
+  int idx,currentidx;
 
   stringlist << QString("None");
-  for (tdt1=context; tdt1!=nullptr; tdt1=tdt1->Next)
+  currentidx=0;
+  for (tdt1=context,idx=1; tdt1!=nullptr; tdt1=tdt1->Next,idx++) {
     stringlist << QString(tdt1->description);
-  s1=QInputDialog::getItem(this,"Set Context","Context",stringlist,0,false,&ok);
+    if (tdt1==todo->context)
+      currentidx=idx;
+    }
+  s1=QInputDialog::getItem(this,"Set Context","Context",stringlist,currentidx,false,&ok);
   if (ok) {
     todo->context=getEntry(context,s1);
     drawAllTasks();
@@ -373,6 +384,7 @@ void MainWindow::editTask(ToDo *todo) {
   bool ok;
   QString s1;
 
+  s1=todo->description;
   s1=QInputDialog::getText(this,"Edit Task","Description:",QLineEdit::Normal,s1,&ok);
   if (ok) {
     todo->description=s1;
@@ -388,7 +400,7 @@ void MainWindow::setPriority(ToDo *todo) {
   stringlist << QString("None");
   for (int i1=1; i1<MAXPRIORITY; i1++)
     stringlist << QString(char(i1+64));
-  s1=QInputDialog::getItem(this,"Set Context","Context",stringlist,0,false,&ok);
+  s1=QInputDialog::getItem(this,"Set Context","Context",stringlist,todo->priority,false,&ok);
   if (ok) {
     todo->priority=stringlist.indexOf(s1);
     drawAllTasks();

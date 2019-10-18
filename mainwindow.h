@@ -38,6 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QPushButton>
 #include <QFrame>
 #include <QLabel>
+#include <QDir>
 #include <QCheckBox>
 #include "todo.h"
 #include "todotag.h"
@@ -75,20 +76,18 @@ class MainWindow : public QMainWindow {
     void on_actionNew_project_triggered();
     void on_actionNew_task_triggered();
     void on_actionPreferences_triggered();
+    void on_actionAbout_triggered();
     void showEvent(QShowEvent *event);
     void closeEvent(QCloseEvent *event);
     void ShowContextMenu(const QPoint &pos,ToDo *todo);
 
-    void on_actionAbout_triggered();
-
-    private:
-    const QString VERSION="0.1.0";
+  private:
     const int MAXLABELWIDTHDIFF=10;
     const int MAXMAILBUTTONWIDTH=100;
     const int MAXPRIORITY=5;
     const unsigned int MAXTASKS=1000;
     const QString TODO_FILENAME="/todo.txt";
-    const QString INI_FILENAME="ZDoList.ini";
+    const QString INI_FILENAME="/ZDoList.ini";
     const QStringList PRIORITY_COLOR={
       "white","#ffafaf","#f0bfbf","#f0cfcf","#f0dfdf","#ffefef"
       };

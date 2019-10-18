@@ -26,7 +26,6 @@ DEFINES += GIT_VERSION=\\\"$$system(git --no-pager show -s --pretty=format:%h -n
 
 CONFIG += c++11
 
-
 SOURCES += \
         main.cpp \
         mainwindow.cpp \

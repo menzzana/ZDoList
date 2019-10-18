@@ -37,15 +37,16 @@ void ToDo::save(QString filename,int length) {
       wout << "x ";
     if (this[i1].priority>0)
       wout << "(" << char(this[i1].priority+64) << ") ";
+    wout << this[i1].description.toStdString();
     if (this[i1].context!=nullptr)
-      wout << "@\'" << this[i1].context->description.toStdString() << "\' ";
+      wout << " @\'" << this[i1].context->description.toStdString() << "\'";
     if (this[i1].project!=nullptr)
-      wout << "+\'" << this[i1].project->description.toStdString() << "\' ";
+      wout << " +\'" << this[i1].project->description.toStdString() << "\'";
     if (this[i1].due.isValid())
-      wout << "due:" << this[i1].due.toString("yyyy-MM-dd").toStdString() << " ";
+      wout << " due:" << this[i1].due.toString("yyyy-MM-dd").toStdString();
     if (!this[i1].url.isEmpty())
-      wout << "url:\'" << this[i1].url.toString().toStdString() << "\' ";
-    wout << this[i1].description.toStdString() << endl;
+      wout << " url:\'" << this[i1].url.toString().toStdString() << "\'";
+    wout << endl;
     }
   wout.close();
   }
@@ -55,12 +56,15 @@ QString ToDo::getTaskValue(string fstr,int start,char end) {
   }
 //------------------------------------------------------------------------------
 int ToDo::load(QString filename,ToDoTag **context,ToDoTag **project) {
+  const int TODOTAGLENGTH=4;
+  string TODOTAG[TODOTAGLENGTH]={
+    " @'"," +'"," due:"," url:"
+    };
   ToDoTag *tdt1;
   ifstream fin;
   string fstr;
   QString s1;
-  int spacechar;
-  int length;
+  int spacechar,length,minposition,pos;
 
   length=0;
   fin.open(filename.toStdString().c_str());
@@ -76,8 +80,17 @@ int ToDo::load(QString filename,ToDoTag **context,ToDoTag **project) {
       this[length].priority=static_cast<int>(fstr.at(spacechar+1))-64;
       spacechar=spacechar+4;
       }
-    if (fstr.at(spacechar)=='@') {
-      s1=getTaskValue(fstr,spacechar+2,'\'');
+    minposition=fstr.length();
+    for (int i1=0; i1<TODOTAGLENGTH; i1++) {
+      pos=fstr.find(TODOTAG[i1],spacechar);
+      if (pos==string::npos)
+        continue;
+      minposition=min(minposition,static_cast<int>(pos));
+      }
+    this[length].description=QString::fromStdString(fstr.substr(spacechar,minposition-spacechar));
+    spacechar=minposition;
+    if (fstr.substr(spacechar,2)==" @") {
+      s1=getTaskValue(fstr,spacechar+3,'\'');
       tdt1=addEntry(*context,s1);
       if (*context==nullptr)
         *context=tdt1;
@@ -85,8 +98,8 @@ int ToDo::load(QString filename,ToDoTag **context,ToDoTag **project) {
       this[length].context=tdt1;
       spacechar=spacechar+s1.length()+4;
       }
-    if (fstr.at(spacechar)=='+') {
-      s1=getTaskValue(fstr,spacechar+2,'\'');
+    if (fstr.substr(spacechar,2)==" +") {
+      s1=getTaskValue(fstr,spacechar+3,'\'');
       tdt1=addEntry(*project,s1);
       if (*project==nullptr)
         *project=tdt1;
@@ -94,17 +107,15 @@ int ToDo::load(QString filename,ToDoTag **context,ToDoTag **project) {
       this[length].project=tdt1;
       spacechar=spacechar+s1.length()+4;
       }
-    if (fstr.substr(spacechar,4)=="due:") {
-      s1=getTaskValue(fstr,spacechar+4,' ');
+    if (fstr.substr(spacechar,5)==" due:") {
+      s1=getTaskValue(fstr,spacechar+5,' ');
       this[length].due=QDate::fromString(s1,"yyyy-MM-dd");
       spacechar=spacechar+15;
       }
-    if (fstr.substr(spacechar,4)=="url:") {
-      s1=getTaskValue(fstr,spacechar+5,'\'');
+    if (fstr.substr(spacechar,5)==" url:") {
+      s1=getTaskValue(fstr,spacechar+6,'\'');
       this[length].url=s1;
-      spacechar=spacechar+s1.length()+7;
       }
-    this[length].description=QString::fromStdString(fstr.substr(spacechar,string::npos));
     length++;
     }
   fin.close();

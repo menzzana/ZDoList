@@ -3,13 +3,18 @@
 ZDoList is a Taskmanager for handling simple tasks.
 The main advantage is that you can drag/drop mails or copy mails from your favorite mail client directly to the software, and the software will retain a direct link to the mail client and, if needed, can open the mail within the client.
 
-At the moment this does although only work with **Thunderbird**
-
+At the moment this does although only work with **Thunderbird** but will in the future include other
+mail clients.
 
 ## File format
 
 The software works by using todo.txt file format http://todotxt.org/
 with the exception that **context**, **project** and **url:** are confined by '
+
+## Installation
+
+ZDoList is created using Qt Creator, so you need to download the repositories
+and then compile the code using Qt. No other dependencies for compilation are needed.
 
 ## Dependencies
 
@@ -28,7 +33,7 @@ the *thunderlink* plugin.
    textbox
    and then in multi-row textbox
 
-     <thunderlink\>|\<subject\>
+     \<thunderlink\>|\<subject\>
 
 ### Using Thunderlink
 
