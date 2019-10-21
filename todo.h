@@ -43,6 +43,8 @@ class ToDo {
     QString getTaskValue(string fstr,int start,char end);
     int load(QString filename,ToDoTag **context,ToDoTag **project);
     static int compareTasks(const void *a,const void *b);
+    static int compareTasksPriority(const void *a,const void *b);
+    static int compareTasksDueDate(const void *a,const void *b);
   };
 //------------------------------------------------------------------------------
 #endif // TODO_H

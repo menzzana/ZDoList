@@ -33,8 +33,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   taskWidget->setLayout(taskLayout);
   project=context=nullptr;
   maintodo=new ToDo[MAXTASKS];
-  nmaintodo=0;
-  mailsoftware=0;
+  nmaintodo=mailsoftware=0;
+  sortorder=SORTORDER::DEFAULT;
   todofilename="";
   }
 //------------------------------------------------------------------------------
@@ -182,8 +182,38 @@ void MainWindow::ShowContextMenu(const QPoint &pos,ToDo *todo) {
       setPriority(todo);
       }
     );
+  action=new QAction("Delete",this);
+  menu->addAction(action);
+  connect(action,&QAction::triggered, [=] {
+      deleteTask(todo);
+      }
+    );
   menu->exec(this->mapToGlobal(pos));
   menu->close();
+  }
+//------------------------------------------------------------------------------
+void MainWindow::on_actionSort_by_context_triggered() {
+  ui->actionSort_by_context->setChecked(true);
+  ui->actionSort_by_priority->setChecked(false);
+  ui->actionSort_by_due_date->setChecked(false);
+  sortorder=SORTORDER::DEFAULT;
+  drawAllTasks();
+  }
+//------------------------------------------------------------------------------
+void MainWindow::on_actionSort_by_priority_triggered() {
+  ui->actionSort_by_context->setChecked(false);
+  ui->actionSort_by_priority->setChecked(true);
+  ui->actionSort_by_due_date->setChecked(false);
+  sortorder=SORTORDER::PRIORITY;
+  drawAllTasks();
+  }
+//------------------------------------------------------------------------------
+void MainWindow::on_actionSort_by_due_date_triggered() {
+  ui->actionSort_by_context->setChecked(false);
+  ui->actionSort_by_priority->setChecked(false);
+  ui->actionSort_by_due_date->setChecked(true);
+  sortorder=SORTORDER::DUEDATE;
+  drawAllTasks();
   }
 //------------------------------------------------------------------------------
 // User defined functions
@@ -258,6 +288,7 @@ void MainWindow::addToDo(ToDo *todo) {
     );
   row=0;
   checkbox=new QCheckBox();
+  checkbox->setFont(QFont("Ubuntu",9));
   if (todo->completed) {
     checkbox->setChecked(true);
     frame->setStyleSheet("background-color: lightgreen");
@@ -274,12 +305,14 @@ void MainWindow::addToDo(ToDo *todo) {
   row++;
   if (todo->context!=nullptr) {
     label=new QLabel();
+    label->setFont(QFont("Ubuntu",9));
     label->setText(setTextColor("@"+todo->context->description,"darkmagenta"));
     label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
     myLayout->addWidget(label,row,0,1,1);
     }
   if (todo->project!=nullptr) {
     label=new QLabel();
+    label->setFont(QFont("Ubuntu",9));
     label->setText(setTextColor("+"+todo->project->description,"darkblue"));
     label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
     myLayout->addWidget(label,row,1,1,2);
@@ -288,6 +321,7 @@ void MainWindow::addToDo(ToDo *todo) {
     row++;
   if (todo->due.isValid()) {
     label=new QLabel();
+    label->setFont(QFont("Ubuntu",9));
     if (todo->due<QDate::currentDate())
       duecolor="red";
     else
@@ -298,12 +332,14 @@ void MainWindow::addToDo(ToDo *todo) {
     }
   if (todo->priority>0) {
     label=new QLabel();
+    label->setFont(QFont("Ubuntu",9));
     label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
     label->setText(setTextColor(QString(char(todo->priority+64)),"black"));
     myLayout->addWidget(label,row,2,1,1);
     }
   if (!todo->url.isEmpty()) {
     button=new QPushButton();
+    button->setFont(QFont("Ubuntu",9));
     button->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
     button->setText("Mail");
     myLayout->addWidget(button,row,1,1,1);
@@ -320,7 +356,17 @@ void MainWindow::drawAllTasks() {
     delete item->widget();
     delete item;
     }
-  qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasks);
+  switch (sortorder) {
+    case SORTORDER::DEFAULT:
+      qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasks);
+      break;
+    case SORTORDER::PRIORITY:
+      qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasksPriority);
+      break;
+    case SORTORDER::DUEDATE:
+      qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasksDueDate);
+      break;
+    }
   for (int i1=0; i1<nmaintodo; i1++)
     addToDo(&maintodo[i1]);
   }
@@ -424,3 +470,18 @@ void MainWindow::setCompleted(QCheckBox *checkbox,ToDo *todo) {
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
+void MainWindow::deleteTask(ToDo *todo) {
+  bool found;
+
+  found=false;
+  for (int i1=0,found=false; i1<nmaintodo; i1++) {
+    if (todo==&maintodo[i1])
+      found=true;
+    if (found)
+      memcpy(&maintodo[i1],&maintodo[i1+1],sizeof(ToDo));
+    }
+  nmaintodo--;
+  drawAllTasks();
+  }
+//------------------------------------------------------------------------------
+

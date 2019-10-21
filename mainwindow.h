@@ -67,6 +67,7 @@ class MainWindow : public QMainWindow {
     void editTask(ToDo *todo);
     void setPriority(ToDo *todo);
     void setDueDate(ToDo *todo);
+    void deleteTask(ToDo *todo);
     void setCompleted(QCheckBox *checkbox,ToDo *todo);
     QString setTextColor(QString text,QString htmlfontcolor);
 
@@ -81,6 +82,12 @@ class MainWindow : public QMainWindow {
     void closeEvent(QCloseEvent *event);
     void ShowContextMenu(const QPoint &pos,ToDo *todo);
 
+    void on_actionSort_by_context_triggered();
+
+    void on_actionSort_by_priority_triggered();
+
+    void on_actionSort_by_due_date_triggered();
+
   private:
     const int MAXLABELWIDTHDIFF=10;
     const int MAXMAILBUTTONWIDTH=100;
@@ -94,10 +101,10 @@ class MainWindow : public QMainWindow {
     const QStringList MAILSOFTWARE={
       "Thunderbird"
       };
+    enum SORTORDER {DEFAULT,PRIORITY,DUEDATE};
     Ui::MainWindow *ui;
     ToDo *maintodo;
-    int nmaintodo;
-    int mailsoftware;
+    int nmaintodo,mailsoftware,sortorder;
     ToDoTag *project,*context;
     QString todofilename;
     QWidget *taskWidget;

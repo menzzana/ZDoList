@@ -147,6 +147,38 @@ int ToDo::compareTasks(const void *a,const void *b) {
     return todoa->priority==0?1:todob->priority==0?-1:todoa->priority-todob->priority;
   if (todoa->due.isValid() && todob->due.isValid())
     return (todoa->due<todob->due?-1:1);
+  if (todoa->due.isValid() || todob->due.isValid())
+    return todoa->due.isValid()?-1:1;
+  return 0;
+  }
+//------------------------------------------------------------------------------
+int ToDo::compareTasksPriority(const void *a,const void *b) {
+  ToDo *todoa=(ToDo *)a;
+  ToDo *todob=(ToDo *)b;
+  int comp_result;
+
+  if (todoa->completed!=todob->completed)
+    return todoa->completed?1:-1;
+  if (todoa->priority!=todob->priority)
+    return todoa->priority==0?1:todob->priority==0?-1:todoa->priority-todob->priority;
+  if (todoa->due.isValid() && todob->due.isValid())
+    return (todoa->due<todob->due?-1:1);
+  if (todoa->due.isValid() || todob->due.isValid())
+    return todoa->due.isValid()?-1:1;
+  return 0;
+  }
+//------------------------------------------------------------------------------
+int ToDo::compareTasksDueDate(const void *a,const void *b) {
+  ToDo *todoa=(ToDo *)a;
+  ToDo *todob=(ToDo *)b;
+  int comp_result;
+
+  if (todoa->completed!=todob->completed)
+    return todoa->completed?1:-1;
+  if (todoa->due.isValid() && todob->due.isValid())
+    return (todoa->due<todob->due?-1:1);
+  if (todoa->due.isValid() || todob->due.isValid())
+    return todoa->due.isValid()?-1:1;
   return 0;
   }
 //------------------------------------------------------------------------------

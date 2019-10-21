@@ -41,3 +41,28 @@ the *thunderlink* plugin.
    using *CTRL+ALT+7*
 1. When creating new new task do so as normal BUT paste from clipboard directly into the *new task* textbox.
 1. The software should automatically detect that this is a task from thunderbird
+
+## Instructions
+
+The software automatically loads the todo.txt upon startup. If none is found in the folder defined
+in the INI file, the software ask to create one.
+Also, the software automatically saves the file upon exit.
+
+You can also set where the todo.txt should be by using *preferences*
+This menu will although automatically start if no INI file was found.
+
+### Creating tasks
+
+Task can be created using *Edit > New task* where you can create a new task. You can also create
+new *context* and new *project* using *Edit > New context*  and *Edit > New project*
+
+### Changing tasks
+
+By *right-clicking*  on the task you can set a number of features for the task, like *edit task*, *set context*, *set project*, *set priority*, *set due date*, *delete*
+
+You can also set a task to completed by checking the task.
+
+### sort the task
+
+Task are by default sorted according to *context*, *project*, *priority*, *due date*
+If needed the task can also be sorted by *priority* or *due date*.
