@@ -106,7 +106,7 @@ int ToDo::load(QString filename,ToDoTag **context,ToDoTag **project,int daysdele
       this[length].completion=this[length].creation;
       this[length].creation=date1;
       spacechar=spacechar+11;
-      if (date1.addDays(daysdeletecompleted)<QDate::currentDate() && daysdeletecompleted>0)
+      if (this[length].completion.addDays(daysdeletecompleted)<QDate::currentDate() && daysdeletecompleted>0)
         continue;
       }
     minposition=fstr.length();
