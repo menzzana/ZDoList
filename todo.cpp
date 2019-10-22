@@ -26,18 +26,31 @@ ToDo::ToDo() {
   project=nullptr;
   url="";
   due.setDate(0,0,0);
+  completion.setDate(0,0,0);
+  creation=QDate::currentDate();
   }
 //------------------------------------------------------------------------------
 void ToDo::save(QString filename,int length) {
   ofstream wout;
+  string firstspace;
 
   wout.open(filename.toStdString().c_str(),ofstream::out);
   for (int i1=0; i1<length; i1++) {
-    if (this[i1].completed)
-      wout << "x ";
-    if (this[i1].priority>0)
-      wout << "(" << char(this[i1].priority+64) << ") ";
-    wout << this[i1].description.toStdString();
+    firstspace="";
+    if (this[i1].completed) {
+      wout << "x";
+      firstspace=" ";
+      }
+    if (this[i1].priority>0) {
+      wout << firstspace << "(" << char(this[i1].priority+64) << ")";
+      firstspace=" ";
+      }
+    if (this[i1].completion.isValid()) {
+      wout << firstspace << this[i1].completion.toString("yyyy-MM-dd").toStdString();
+      firstspace=" ";
+      }
+    wout << firstspace << this[i1].creation.toString("yyyy-MM-dd").toStdString();
+    wout << " " << this[i1].description.toStdString();
     if (this[i1].context!=nullptr)
       wout << " @\'" << this[i1].context->description.toStdString() << "\'";
     if (this[i1].project!=nullptr)
@@ -55,7 +68,7 @@ QString ToDo::getTaskValue(string fstr,int start,char end) {
   return QString::fromStdString(fstr.substr(start,fstr.find_first_of(end,start)-start));
   }
 //------------------------------------------------------------------------------
-int ToDo::load(QString filename,ToDoTag **context,ToDoTag **project) {
+int ToDo::load(QString filename,ToDoTag **context,ToDoTag **project,int daysdeletecompleted) {
   const int TODOTAGLENGTH=4;
   string TODOTAG[TODOTAGLENGTH]={
     " @'"," +'"," due:"," url:"
@@ -65,6 +78,7 @@ int ToDo::load(QString filename,ToDoTag **context,ToDoTag **project) {
   string fstr;
   QString s1;
   int spacechar,length,minposition,pos;
+  QDate date1;
 
   length=0;
   fin.open(filename.toStdString().c_str());
@@ -79,6 +93,21 @@ int ToDo::load(QString filename,ToDoTag **context,ToDoTag **project) {
     if (fstr.at(spacechar)=='(' && fstr.substr(spacechar+2,2)==") ") {
       this[length].priority=static_cast<int>(fstr.at(spacechar+1))-64;
       spacechar=spacechar+4;
+      }
+    s1=getTaskValue(fstr,spacechar,' ');
+    date1=QDate::fromString(s1,"yyyy-MM-dd");
+    if (date1.isValid()) {
+      this[length].creation=date1;
+      spacechar=spacechar+11;
+      }
+    s1=getTaskValue(fstr,spacechar,' ');
+    date1=QDate::fromString(s1,"yyyy-MM-dd");
+    if (date1.isValid()) {
+      this[length].completion=this[length].creation;
+      this[length].creation=date1;
+      spacechar=spacechar+11;
+      if (date1.addDays(daysdeletecompleted)<QDate::currentDate() && daysdeletecompleted>0)
+        continue;
       }
     minposition=fstr.length();
     for (int i1=0; i1<TODOTAGLENGTH; i1++) {

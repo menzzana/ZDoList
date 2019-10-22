@@ -48,11 +48,25 @@ void PreferencesDialog::setSoftware(QStringList softwarelist,int softwareindex) 
   ui->comboBox->setCurrentIndex(softwareindex);
   }
 //------------------------------------------------------------------------------
+void PreferencesDialog::setDeleteDays(int days) {
+  ui->checkBox->setChecked(days>0);
+  ui->lineEdit_2->setReadOnly(days==0);
+  ui->lineEdit_2->setText(QString::number(days));
+  }
+//------------------------------------------------------------------------------
 QString PreferencesDialog::getFileName() {
   return ui->lineEdit->text();
   }
 //------------------------------------------------------------------------------
 int PreferencesDialog::getSoftware() {
   return ui->comboBox->currentIndex();
+  }
+//------------------------------------------------------------------------------
+int PreferencesDialog::getDeleteDays() {
+  return ui->checkBox->checkState()?ui->lineEdit_2->text().toInt():0;
+  }
+//------------------------------------------------------------------------------
+void PreferencesDialog::on_checkBox_stateChanged(int arg1) {
+  ui->lineEdit_2->setReadOnly(!arg1);
   }
 //------------------------------------------------------------------------------

@@ -104,7 +104,7 @@ class MainWindow : public QMainWindow {
     enum SORTORDER {DEFAULT,PRIORITY,DUEDATE};
     Ui::MainWindow *ui;
     ToDo *maintodo;
-    int nmaintodo,mailsoftware,sortorder;
+    int nmaintodo,mailsoftware,sortorder,daysdeletecompleted;
     ToDoTag *project,*context;
     QString todofilename;
     QWidget *taskWidget;

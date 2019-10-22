@@ -34,13 +34,16 @@ class PreferencesDialog : public QDialog {
     ~PreferencesDialog();
     void setFileName(QString filename,QString fullfilename);
     void setSoftware(QStringList softwarelist,int softwareindex);
+    void setDeleteDays(int days);
     QString getFileName();
     int getSoftware();
+    int getDeleteDays();
 
   private slots:
     void on_pushButton_clicked();
+    void on_checkBox_stateChanged(int arg1);
 
-  private:
+private:
     Ui::PreferencesDialog *ui;
     QString filename;
   };

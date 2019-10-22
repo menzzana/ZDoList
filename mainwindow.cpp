@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   taskWidget->setLayout(taskLayout);
   project=context=nullptr;
   maintodo=new ToDo[MAXTASKS];
-  nmaintodo=mailsoftware=0;
+  nmaintodo=mailsoftware=daysdeletecompleted=0;
   sortorder=SORTORDER::DEFAULT;
   todofilename="";
   }
@@ -99,12 +99,14 @@ void MainWindow::on_actionNew_task_triggered() {
         sl2=sl1.at(i1).split("|");
         maintodo[nmaintodo].description=sl2.at(1);
         maintodo[nmaintodo].url=sl2.at(0);
+        maintodo[nmaintodo].creation=QDate::currentDate();
         addToDo(&maintodo[nmaintodo]);
         nmaintodo++;
         }
       return;
       }
     maintodo[nmaintodo].description=s1;
+    maintodo[nmaintodo].creation=QDate::currentDate();
     addToDo(&maintodo[nmaintodo]);
     nmaintodo++;
     drawAllTasks();
@@ -124,6 +126,7 @@ void MainWindow::dropEvent(QDropEvent *event) {
       s1="Mail (Thunderbird)";
     maintodo[nmaintodo].description=s1;
     maintodo[nmaintodo].url=item.url();
+    maintodo[nmaintodo].creation=QDate::currentDate();
     addToDo(&maintodo[nmaintodo]);
     nmaintodo++;
     cout << item.url().toStdString() << endl;
@@ -227,12 +230,15 @@ void MainWindow::preferences() {
 
   prefdialog.setFileName(TODO_FILENAME,todofilename);
   prefdialog.setSoftware(MAILSOFTWARE,mailsoftware);
+  prefdialog.setDeleteDays(daysdeletecompleted);
   if (prefdialog.exec()==QDialog::Accepted) {
     todofilename=prefdialog.getFileName();
     mailsoftware=prefdialog.getSoftware();
+    daysdeletecompleted=prefdialog.getDeleteDays();
     QSettings settings(QDir::currentPath()+INI_FILENAME, QSettings::IniFormat);
     settings.setValue("ToDoFile",todofilename);
     settings.setValue("MailSoftware",mailsoftware);
+    settings.setValue("DeleteDays",daysdeletecompleted);
     }
   prefdialog.close();
   }
@@ -256,10 +262,11 @@ void MainWindow::loadTasks() {
   QSettings settings(QDir::currentPath()+INI_FILENAME, QSettings::IniFormat);
   todofilename=settings.value("ToDoFile","").toString();
   mailsoftware=settings.value("MailSoftware",0).toInt();
+  daysdeletecompleted=settings.value("DeleteDays",0).toInt();
   if (todofilename.isEmpty())
     preferences();
   checkEmptyToDoFile();
-  nmaintodo=maintodo->load(todofilename,&context,&project);
+  nmaintodo=maintodo->load(todofilename,&context,&project,daysdeletecompleted);
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
@@ -467,6 +474,7 @@ void MainWindow::setDueDate(ToDo *todo) {
 //------------------------------------------------------------------------------
 void MainWindow::setCompleted(QCheckBox *checkbox,ToDo *todo) {
   todo->completed=checkbox->isChecked();
+  todo->completion=QDate::currentDate();
   drawAllTasks();
   }
 //------------------------------------------------------------------------------

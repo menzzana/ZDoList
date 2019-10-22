@@ -36,12 +36,12 @@ class ToDo {
     QUrl url;
     ToDoTag *context;
     ToDoTag *project;
-    QDate due;
+    QDate due,completion,creation;
 
     ToDo();
     void save(QString filename,int length);
     QString getTaskValue(string fstr,int start,char end);
-    int load(QString filename,ToDoTag **context,ToDoTag **project);
+    int load(QString filename,ToDoTag **context,ToDoTag **project,int daysdeletecompleted);
     static int compareTasks(const void *a,const void *b);
     static int compareTasksPriority(const void *a,const void *b);
     static int compareTasksDueDate(const void *a,const void *b);
