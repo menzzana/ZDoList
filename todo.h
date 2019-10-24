@@ -39,6 +39,7 @@ class ToDo {
     QDate due,completion,creation;
 
     ToDo();
+    void clear();
     void save(QString filename,int length);
     QString getTaskValue(string fstr,int start,char end);
     int load(QString filename,ToDoTag **context,ToDoTag **project,int daysdeletecompleted);

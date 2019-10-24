@@ -94,16 +94,16 @@ void MainWindow::on_actionNew_task_triggered() {
       sl1=s1.split(" / ");
       for (int i1=0; i1<sl1.size(); i1++)  {
         sl2=sl1.at(i1).split("|");
+        maintodo[nmaintodo].clear();
         maintodo[nmaintodo].description=sl2.at(1);
         maintodo[nmaintodo].url=sl2.at(0);
-        maintodo[nmaintodo].creation=QDate::currentDate();
         addToDo(&maintodo[nmaintodo]);
         nmaintodo++;
         }
       return;
       }
+    maintodo[nmaintodo].clear();
     maintodo[nmaintodo].description=s1;
-    maintodo[nmaintodo].creation=QDate::currentDate();
     addToDo(&maintodo[nmaintodo]);
     nmaintodo++;
     drawAllTasks();
@@ -121,9 +121,9 @@ void MainWindow::dropEvent(QDropEvent *event) {
     s1=item.url();
     if (item.url().startsWith("imap"))
       s1="Mail (Thunderbird)";
+    maintodo[nmaintodo].clear();
     maintodo[nmaintodo].description=s1;
     maintodo[nmaintodo].url=item.url();
-    maintodo[nmaintodo].creation=QDate::currentDate();
     addToDo(&maintodo[nmaintodo]);
     nmaintodo++;
     cout << item.url().toStdString() << endl;
@@ -479,7 +479,7 @@ void MainWindow::deleteTask(ToDo *todo) {
   bool found;
 
   found=false;
-  for (int i1=0,found=false; i1<nmaintodo; i1++) {
+  for (int i1=0; i1<nmaintodo; i1++) {
     if (todo==&maintodo[i1])
       found=true;
     if (found)
