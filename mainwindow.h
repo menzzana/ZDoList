@@ -78,14 +78,10 @@ class MainWindow : public QMainWindow {
     void on_actionNew_task_triggered();
     void on_actionPreferences_triggered();
     void on_actionAbout_triggered();
-    void showEvent(QShowEvent *event);
     void closeEvent(QCloseEvent *event);
     void ShowContextMenu(const QPoint &pos,ToDo *todo);
-
     void on_actionSort_by_context_triggered();
-
     void on_actionSort_by_priority_triggered();
-
     void on_actionSort_by_due_date_triggered();
 
   private:

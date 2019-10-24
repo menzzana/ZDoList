@@ -184,7 +184,6 @@ int ToDo::compareTasks(const void *a,const void *b) {
 int ToDo::compareTasksPriority(const void *a,const void *b) {
   ToDo *todoa=(ToDo *)a;
   ToDo *todob=(ToDo *)b;
-  int comp_result;
 
   if (todoa->completed!=todob->completed)
     return todoa->completed?1:-1;
@@ -200,7 +199,6 @@ int ToDo::compareTasksPriority(const void *a,const void *b) {
 int ToDo::compareTasksDueDate(const void *a,const void *b) {
   ToDo *todoa=(ToDo *)a;
   ToDo *todob=(ToDo *)b;
-  int comp_result;
 
   if (todoa->completed!=todob->completed)
     return todoa->completed?1:-1;

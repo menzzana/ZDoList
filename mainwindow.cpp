@@ -36,16 +36,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   nmaintodo=mailsoftware=daysdeletecompleted=0;
   sortorder=SORTORDER::DEFAULT;
   todofilename="";
+  loadTasks();
   }
 //------------------------------------------------------------------------------
 MainWindow::~MainWindow() {
   delete project;
   delete context;
   delete ui;
-  }
-//------------------------------------------------------------------------------
-void MainWindow::showEvent(QShowEvent *event) {
-  loadTasks();
   }
 //------------------------------------------------------------------------------
 void MainWindow::on_actionExit_triggered() {
