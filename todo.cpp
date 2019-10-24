@@ -156,8 +156,6 @@ int ToDo::compareTasks(const void *a,const void *b) {
   ToDo *todob=(ToDo *)b;
   int comp_result;
 
-  if (todoa->completed!=todob->completed)
-    return todoa->completed?1:-1;
   if ((todoa->context==nullptr)^(todob->context==nullptr))
     return todoa->context==nullptr?1:-1;
   if (todoa->context!=nullptr && todob->context!=nullptr) {
@@ -172,6 +170,8 @@ int ToDo::compareTasks(const void *a,const void *b) {
     if (comp_result!=0)
       return comp_result;
     }
+  if (todoa->completed!=todob->completed)
+    return todoa->completed?1:-1;
   if (todoa->priority!=todob->priority)
     return todoa->priority==0?1:todob->priority==0?-1:todoa->priority-todob->priority;
   if (todoa->due.isValid() && todob->due.isValid())

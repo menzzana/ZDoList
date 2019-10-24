@@ -298,10 +298,10 @@ void MainWindow::addToDo(ToDo *todo) {
   checkbox->setFont(QFont("Ubuntu",9));
   if (todo->completed) {
     checkbox->setChecked(true);
-    frame->setStyleSheet("background-color: lightgreen");
+    frame->setStyleSheet("color: black; background-color: lightgreen");
     }
   else
-    frame->setStyleSheet("background-color: "+PRIORITY_COLOR.at(todo->priority));
+    frame->setStyleSheet("color: black; background-color: "+PRIORITY_COLOR.at(todo->priority));
   checkbox->setText(todo->description);
   checkbox->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
   connect(checkbox,&QCheckBox::stateChanged,[=] () {
