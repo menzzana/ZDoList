@@ -83,8 +83,9 @@ class MainWindow : public QMainWindow {
     void on_actionSort_by_context_triggered();
     void on_actionSort_by_priority_triggered();
     void on_actionSort_by_due_date_triggered();
+    void on_actionFilter_nonprioritized_triggered();
 
-  private:
+private:
     const int MAXLABELWIDTHDIFF=10;
     const int MAXMAILBUTTONWIDTH=100;
     const int MAXPRIORITY=5;
@@ -101,6 +102,7 @@ class MainWindow : public QMainWindow {
     Ui::MainWindow *ui;
     ToDo *maintodo;
     int nmaintodo,mailsoftware,sortorder,daysdeletecompleted;
+    bool nonprioritized;
     ToDoTag *project,*context;
     QString todofilename;
     QWidget *taskWidget;

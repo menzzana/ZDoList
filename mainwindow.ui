@@ -36,12 +36,12 @@
      <x>0</x>
      <y>0</y>
      <width>373</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="separator"/>
     <addaction name="actionPreferences"/>
@@ -50,7 +50,7 @@
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>&amp;Edit</string>
     </property>
     <addaction name="actionNew_context"/>
     <addaction name="actionNew_project"/>
@@ -58,11 +58,12 @@
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
     <addaction name="actionSort_by_context"/>
     <addaction name="actionSort_by_priority"/>
     <addaction name="actionSort_by_due_date"/>
+    <addaction name="actionFilter_nonprioritized"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -79,32 +80,38 @@
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionPreferences">
    <property name="text">
-    <string>Preferences</string>
+    <string>&amp;Preferences</string>
    </property>
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
    </property>
   </action>
   <action name="actionExit">
    <property name="text">
-    <string>Exit</string>
+    <string>&amp;Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="actionNew_context">
    <property name="text">
-    <string>New context</string>
+    <string>&amp;New context</string>
    </property>
   </action>
   <action name="actionNew_project">
    <property name="text">
-    <string>New project</string>
+    <string>New &amp;project</string>
    </property>
   </action>
   <action name="actionNew_task">
    <property name="text">
-    <string>New task</string>
+    <string>N&amp;ew task</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
   <action name="actionSort_by_context">
@@ -115,7 +122,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Sort by context</string>
+    <string>&amp;Sort by context</string>
    </property>
   </action>
   <action name="actionSort_by_priority">
@@ -123,7 +130,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Sort by priority</string>
+    <string>Sort &amp;by priority</string>
    </property>
   </action>
   <action name="actionSort_by_due_date">
@@ -131,7 +138,15 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Sort by due date</string>
+    <string>Sort by &amp;due date</string>
+   </property>
+  </action>
+  <action name="actionFilter_nonprioritized">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Filter nonprioritized</string>
    </property>
   </action>
  </widget>

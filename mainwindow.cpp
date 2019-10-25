@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   nmaintodo=mailsoftware=daysdeletecompleted=0;
   sortorder=SORTORDER::DEFAULT;
   todofilename="";
+  nonprioritized=false;
   loadTasks();
   }
 //------------------------------------------------------------------------------
@@ -216,6 +217,11 @@ void MainWindow::on_actionSort_by_due_date_triggered() {
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
+void MainWindow::on_actionFilter_nonprioritized_triggered() {
+  nonprioritized=ui->actionFilter_nonprioritized->isChecked();
+  drawAllTasks();
+  }
+//------------------------------------------------------------------------------
 // User defined functions
 //------------------------------------------------------------------------------
 QString MainWindow::setTextColor(QString text,QString htmlfontcolor) {
@@ -372,7 +378,8 @@ void MainWindow::drawAllTasks() {
       break;
     }
   for (int i1=0; i1<nmaintodo; i1++)
-    addToDo(&maintodo[i1]);
+    if (!nonprioritized || (maintodo[i1].priority==0 && !maintodo[i1].completed))
+      addToDo(&maintodo[i1]);
   }
 //------------------------------------------------------------------------------
 void MainWindow::gotoMail(ToDo *todo) {
