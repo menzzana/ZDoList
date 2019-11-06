@@ -68,7 +68,7 @@ int PreferencesDialog::getSoftware() {
   }
 //------------------------------------------------------------------------------
 bool PreferencesDialog::getArchiving() {
-  return ui->comboBox->currentIndex()>0;
+  return ui->comboBox_2->currentIndex()>0;
   }
 //------------------------------------------------------------------------------
 int PreferencesDialog::getDeleteDays() {
