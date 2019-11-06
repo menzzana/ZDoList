@@ -70,6 +70,7 @@ class MainWindow : public QMainWindow {
     void deleteTask(ToDo *todo);
     void setCompleted(QCheckBox *checkbox,ToDo *todo);
     QString setTextColor(QString text,QString htmlfontcolor);
+    string getFileName(QString filename);
 
   private slots:
     void on_actionExit_triggered();
@@ -85,12 +86,13 @@ class MainWindow : public QMainWindow {
     void on_actionSort_by_due_date_triggered();
     void on_actionFilter_nonprioritized_triggered();
 
-private:
+  private:
     const int MAXLABELWIDTHDIFF=10;
     const int MAXMAILBUTTONWIDTH=100;
     const int MAXPRIORITY=5;
     const unsigned int MAXTASKS=1000;
     const QString TODO_FILENAME="/todo.txt";
+    const QString DONE_FILENAME="/done.txt";
     const QString INI_FILENAME="/ZDoList.ini";
     const QStringList PRIORITY_COLOR={
       "white","#ffafaf","#f0bfbf","#f0cfcf","#f0dfdf","#ffefef"
@@ -102,9 +104,9 @@ private:
     Ui::MainWindow *ui;
     ToDo *maintodo;
     int nmaintodo,mailsoftware,sortorder,daysdeletecompleted;
-    bool nonprioritized;
+    bool nonprioritized,archiving;
     ToDoTag *project,*context;
-    QString todofilename;
+    QString todofilepath;
     QWidget *taskWidget;
     QVBoxLayout *taskLayout;
   };

@@ -34,11 +34,11 @@ void ToDo::clear() {
   creation=QDate::currentDate();
   }
 //------------------------------------------------------------------------------
-void ToDo::save(QString filename,int length) {
+void ToDo::save(string filename,int length) {
   ofstream wout;
   string firstspace;
 
-  wout.open(filename.toStdString().c_str(),ofstream::out);
+  wout.open(filename.c_str(),ofstream::out);
   for (int i1=0; i1<length; i1++) {
     firstspace="";
     if (this[i1].completed) {
@@ -72,20 +72,22 @@ QString ToDo::getTaskValue(string fstr,int start,char end) {
   return QString::fromStdString(fstr.substr(start,fstr.find_first_of(end,start)-start));
   }
 //------------------------------------------------------------------------------
-int ToDo::load(QString filename,ToDoTag **context,ToDoTag **project,int daysdeletecompleted) {
+int ToDo::load(string filename,string donefile,ToDoTag **context,ToDoTag **project,bool archiving,int daysdeletecompleted) {
   const int TODOTAGLENGTH=4;
   string TODOTAG[TODOTAGLENGTH]={
     " @'"," +'"," due:"," url:"
     };
   ToDoTag *tdt1;
   ifstream fin;
+  ofstream wout;
   string fstr;
   QString s1;
   int spacechar,length,minposition,pos;
   QDate date1;
 
   length=0;
-  fin.open(filename.toStdString().c_str());
+  fin.open(filename.c_str());
+  wout.open(donefile.c_str(),ofstream::out|ofstream::app);
   while (getline(fin,fstr)) {
     if (fstr.length()==0)
       break;
@@ -110,8 +112,11 @@ int ToDo::load(QString filename,ToDoTag **context,ToDoTag **project,int daysdele
       this[length].completion=this[length].creation;
       this[length].creation=date1;
       spacechar=spacechar+11;
-      if (this[length].completion.addDays(daysdeletecompleted)<QDate::currentDate() && daysdeletecompleted>0)
+      if (this[length].completion.addDays(daysdeletecompleted)<QDate::currentDate() && daysdeletecompleted>0) {
+        if (archiving)
+          wout << fstr << endl;
         continue;
+        }
       }
     minposition=fstr.length();
     for (int i1=0; i1<TODOTAGLENGTH; i1++) {
@@ -152,6 +157,7 @@ int ToDo::load(QString filename,ToDoTag **context,ToDoTag **project,int daysdele
     length++;
     }
   fin.close();
+  wout.close();
   return length;
   }
 //------------------------------------------------------------------------------

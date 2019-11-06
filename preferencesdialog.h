@@ -32,11 +32,13 @@ class PreferencesDialog : public QDialog {
   public:
     explicit PreferencesDialog(QWidget *parent = nullptr);
     ~PreferencesDialog();
-    void setFileName(QString filename,QString fullfilename);
+    void setFilePath(QString filepath);
     void setSoftware(QStringList softwarelist,int softwareindex);
+    void setArchiving(bool archiving);
     void setDeleteDays(int days);
-    QString getFileName();
+    QString getFilePath();
     int getSoftware();
+    bool getArchiving();
     int getDeleteDays();
 
   private slots:
@@ -45,7 +47,6 @@ class PreferencesDialog : public QDialog {
 
 private:
     Ui::PreferencesDialog *ui;
-    QString filename;
   };
 //------------------------------------------------------------------------------
 #endif // PREFERENCESDIALOG_H

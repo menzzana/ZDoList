@@ -35,8 +35,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   maintodo=new ToDo[MAXTASKS];
   nmaintodo=mailsoftware=daysdeletecompleted=0;
   sortorder=SORTORDER::DEFAULT;
-  todofilename="";
+  todofilepath="";
   nonprioritized=false;
+  archiving=true;
   loadTasks();
   }
 //------------------------------------------------------------------------------
@@ -51,7 +52,7 @@ void MainWindow::on_actionExit_triggered() {
   }
 //------------------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent *event) {
-  ifstream fp(todofilename.toStdString().c_str());
+  ifstream fp(getFileName(TODO_FILENAME).c_str());
   if (fp.good())
     saveTasks();
   }
@@ -228,19 +229,26 @@ QString MainWindow::setTextColor(QString text,QString htmlfontcolor) {
  return "<font color=\""+htmlfontcolor+"\">"+text+"</font>";
   }
 //------------------------------------------------------------------------------
+string MainWindow::getFileName(QString filename) {
+  return (todofilepath+filename).toStdString();
+  }
+//------------------------------------------------------------------------------
 void MainWindow::preferences() {
   PreferencesDialog prefdialog;
 
-  prefdialog.setFileName(TODO_FILENAME,todofilename);
+  prefdialog.setFilePath(todofilepath);
   prefdialog.setSoftware(MAILSOFTWARE,mailsoftware);
+  prefdialog.setArchiving(archiving);
   prefdialog.setDeleteDays(daysdeletecompleted);
   if (prefdialog.exec()==QDialog::Accepted) {
-    todofilename=prefdialog.getFileName();
+    todofilepath=prefdialog.getFilePath();
     mailsoftware=prefdialog.getSoftware();
+    archiving=prefdialog.getArchiving();
     daysdeletecompleted=prefdialog.getDeleteDays();
     QSettings settings(QDir::currentPath()+INI_FILENAME, QSettings::IniFormat);
-    settings.setValue("ToDoFile",todofilename);
+    settings.setValue("ToDoPath",todofilepath);
     settings.setValue("MailSoftware",mailsoftware);
+    settings.setValue("Archiving",archiving);
     settings.setValue("DeleteDays",daysdeletecompleted);
     }
   prefdialog.close();
@@ -249,13 +257,15 @@ void MainWindow::preferences() {
 void MainWindow::checkEmptyToDoFile() {
   QMessageBox msgbox;
 
-  ifstream fp(todofilename.toStdString().c_str());
+  ifstream fp(getFileName(TODO_FILENAME).c_str());
   if (!fp.good()) {
     msgbox.setText("Create Todo.txt file");
     msgbox.setInformativeText("File not found. Do you want to create a Task file?");
     msgbox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
-    if (msgbox.exec()==QMessageBox::Ok)
-      ofstream output(todofilename.toStdString());
+    if (msgbox.exec()==QMessageBox::Ok) {
+      ofstream output(getFileName(TODO_FILENAME));
+      ofstream output2(getFileName(DONE_FILENAME));
+      }
     else
       close();
     }
@@ -263,18 +273,19 @@ void MainWindow::checkEmptyToDoFile() {
 //------------------------------------------------------------------------------
 void MainWindow::loadTasks() {
   QSettings settings(QDir::currentPath()+INI_FILENAME, QSettings::IniFormat);
-  todofilename=settings.value("ToDoFile","").toString();
+  todofilepath=settings.value("ToDoPath","").toString();
   mailsoftware=settings.value("MailSoftware",0).toInt();
+  archiving=settings.value("Archiving",true).toBool();
   daysdeletecompleted=settings.value("DeleteDays",0).toInt();
-  if (todofilename.isEmpty())
+  if (todofilepath.isEmpty())
     preferences();
   checkEmptyToDoFile();
-  nmaintodo=maintodo->load(todofilename,&context,&project,daysdeletecompleted);
+  nmaintodo=maintodo->load(getFileName(TODO_FILENAME),getFileName(DONE_FILENAME),&context,&project,archiving,daysdeletecompleted);
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
 void MainWindow::saveTasks() {
-  maintodo->save(todofilename,nmaintodo);
+  maintodo->save(getFileName(TODO_FILENAME),nmaintodo);
   }
 //------------------------------------------------------------------------------
 void MainWindow::addToDo(ToDo *todo) {
@@ -492,6 +503,7 @@ void MainWindow::deleteTask(ToDo *todo) {
     if (found)
       memcpy(&maintodo[i1],&maintodo[i1+1],sizeof(ToDo));
     }
+  maintodo[nmaintodo].clear();
   nmaintodo--;
   drawAllTasks();
   }

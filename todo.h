@@ -40,9 +40,9 @@ class ToDo {
 
     ToDo();
     void clear();
-    void save(QString filename,int length);
+    void save(string filename,int length);
     QString getTaskValue(string fstr,int start,char end);
-    int load(QString filename,ToDoTag **context,ToDoTag **project,int daysdeletecompleted);
+    int load(string filename,string donefile,ToDoTag **context,ToDoTag **project,bool archiving,int daysdeletecompleted);
     static int compareTasks(const void *a,const void *b);
     static int compareTasksPriority(const void *a,const void *b);
     static int compareTasksDueDate(const void *a,const void *b);
