@@ -22,8 +22,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <iostream>
 #include <QString>
+#include <QStringList>
 //------------------------------------------------------------------------------
 using namespace std;
+//------------------------------------------------------------------------------
+const int MAXLABELWIDTHDIFF=10;
+const int MAXMAILBUTTONWIDTH=100;
+const int MAXPRIORITY=5;
+const int DAYSPERPRIO=7;
+const unsigned int MAXTASKS=1000;
+const QString TODO_FILENAME="/todo.txt";
+const QString DONE_FILENAME="/done.txt";
+const QString INI_FILENAME="/ZDoList.ini";
+const QStringList PRIORITY_COLOR={
+  "white","#ffafaf","#f0bfbf","#f0cfcf","#f0dfdf","#ffefef"
+  };
+const QStringList MAILSOFTWARE={
+  "Thunderbird"
+  };
+enum SORTORDER {DEFAULT,PRIORITY,DUEDATE,PRIORITYDAYSLEFT};
 //------------------------------------------------------------------------------
 template<typename T> T *addEntry(T *first,QString description) {
   T *tl1,*tl2;

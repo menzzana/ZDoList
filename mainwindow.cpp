@@ -51,7 +51,7 @@ void MainWindow::on_actionExit_triggered() {
   close();
   }
 //------------------------------------------------------------------------------
-void MainWindow::closeEvent(QCloseEvent *event) {
+void MainWindow::checkAndSaveTasks() {
   ifstream fp(getFileName(TODO_FILENAME).c_str());
   if (fp.good())
     saveTasks();
@@ -102,6 +102,8 @@ void MainWindow::on_actionNew_task_triggered() {
         addToDo(&maintodo[nmaintodo]);
         nmaintodo++;
         }
+      drawAllTasks();
+      checkAndSaveTasks();
       return;
       }
     maintodo[nmaintodo].clear();
@@ -109,6 +111,7 @@ void MainWindow::on_actionNew_task_triggered() {
     addToDo(&maintodo[nmaintodo]);
     nmaintodo++;
     drawAllTasks();
+    checkAndSaveTasks();
     }
   }
 //------------------------------------------------------------------------------
@@ -128,6 +131,8 @@ void MainWindow::dropEvent(QDropEvent *event) {
     maintodo[nmaintodo].url=item.url();
     addToDo(&maintodo[nmaintodo]);
     nmaintodo++;
+    drawAllTasks();
+    checkAndSaveTasks();
     cout << item.url().toStdString() << endl;
     }
   event->acceptProposedAction();
@@ -198,6 +203,7 @@ void MainWindow::on_actionSort_by_context_triggered() {
   ui->actionSort_by_context->setChecked(true);
   ui->actionSort_by_priority->setChecked(false);
   ui->actionSort_by_due_date->setChecked(false);
+  ui->actionSort_by_priority_days_left->setChecked(false);
   sortorder=SORTORDER::DEFAULT;
   drawAllTasks();
   }
@@ -206,6 +212,7 @@ void MainWindow::on_actionSort_by_priority_triggered() {
   ui->actionSort_by_context->setChecked(false);
   ui->actionSort_by_priority->setChecked(true);
   ui->actionSort_by_due_date->setChecked(false);
+  ui->actionSort_by_priority_days_left->setChecked(false);
   sortorder=SORTORDER::PRIORITY;
   drawAllTasks();
   }
@@ -214,7 +221,17 @@ void MainWindow::on_actionSort_by_due_date_triggered() {
   ui->actionSort_by_context->setChecked(false);
   ui->actionSort_by_priority->setChecked(false);
   ui->actionSort_by_due_date->setChecked(true);
+  ui->actionSort_by_priority_days_left->setChecked(false);
   sortorder=SORTORDER::DUEDATE;
+  drawAllTasks();
+  }
+//------------------------------------------------------------------------------
+void MainWindow::on_actionSort_by_priority_days_left_triggered() {
+  ui->actionSort_by_context->setChecked(false);
+  ui->actionSort_by_priority->setChecked(false);
+  ui->actionSort_by_due_date->setChecked(false);
+  ui->actionSort_by_priority_days_left->setChecked(true);
+  sortorder=SORTORDER::PRIORITYDAYSLEFT;
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
@@ -387,6 +404,9 @@ void MainWindow::drawAllTasks() {
     case SORTORDER::DUEDATE:
       qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasksDueDate);
       break;
+    case SORTORDER::PRIORITYDAYSLEFT:
+      qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasksPriorityDaysLeft);
+      break;
     }
   for (int i1=0; i1<nmaintodo; i1++)
     if (!nonprioritized || (maintodo[i1].priority==0 && !maintodo[i1].completed))
@@ -424,6 +444,7 @@ void MainWindow::setProject(ToDo *todo) {
   if (ok) {
     todo->project=getEntry(project,s1);
     drawAllTasks();
+    checkAndSaveTasks();
     }
   }
 //------------------------------------------------------------------------------
@@ -445,6 +466,7 @@ void MainWindow::setContext(ToDo *todo) {
   if (ok) {
     todo->context=getEntry(context,s1);
     drawAllTasks();
+    checkAndSaveTasks();
     }
   }
 //------------------------------------------------------------------------------
@@ -457,6 +479,7 @@ void MainWindow::editTask(ToDo *todo) {
   if (ok) {
     todo->description=s1;
     drawAllTasks();
+    checkAndSaveTasks();
     }
   }
 //------------------------------------------------------------------------------
@@ -472,6 +495,7 @@ void MainWindow::setPriority(ToDo *todo) {
   if (ok) {
     todo->priority=stringlist.indexOf(s1);
     drawAllTasks();
+    checkAndSaveTasks();
     }
   }
 //------------------------------------------------------------------------------
@@ -484,6 +508,7 @@ void MainWindow::setDueDate(ToDo *todo) {
   else
     todo->due.setDate(0,0,0);
   drawAllTasks();
+  checkAndSaveTasks();
   datedialog.close();
   }
 //------------------------------------------------------------------------------
@@ -491,6 +516,7 @@ void MainWindow::setCompleted(QCheckBox *checkbox,ToDo *todo) {
   todo->completed=checkbox->isChecked();
   todo->completion=QDate::currentDate();
   drawAllTasks();
+  checkAndSaveTasks();
   }
 //------------------------------------------------------------------------------
 void MainWindow::deleteTask(ToDo *todo) {
@@ -506,6 +532,7 @@ void MainWindow::deleteTask(ToDo *todo) {
   maintodo[nmaintodo].clear();
   nmaintodo--;
   drawAllTasks();
+  checkAndSaveTasks();
   }
 //------------------------------------------------------------------------------
 

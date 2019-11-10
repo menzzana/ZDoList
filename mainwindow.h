@@ -79,28 +79,16 @@ class MainWindow : public QMainWindow {
     void on_actionNew_task_triggered();
     void on_actionPreferences_triggered();
     void on_actionAbout_triggered();
-    void closeEvent(QCloseEvent *event);
+    void checkAndSaveTasks();
     void ShowContextMenu(const QPoint &pos,ToDo *todo);
     void on_actionSort_by_context_triggered();
     void on_actionSort_by_priority_triggered();
     void on_actionSort_by_due_date_triggered();
     void on_actionFilter_nonprioritized_triggered();
 
-  private:
-    const int MAXLABELWIDTHDIFF=10;
-    const int MAXMAILBUTTONWIDTH=100;
-    const int MAXPRIORITY=5;
-    const unsigned int MAXTASKS=1000;
-    const QString TODO_FILENAME="/todo.txt";
-    const QString DONE_FILENAME="/done.txt";
-    const QString INI_FILENAME="/ZDoList.ini";
-    const QStringList PRIORITY_COLOR={
-      "white","#ffafaf","#f0bfbf","#f0cfcf","#f0dfdf","#ffefef"
-      };
-    const QStringList MAILSOFTWARE={
-      "Thunderbird"
-      };
-    enum SORTORDER {DEFAULT,PRIORITY,DUEDATE};
+    void on_actionSort_by_priority_days_left_triggered();
+
+    private:
     Ui::MainWindow *ui;
     ToDo *maintodo;
     int nmaintodo,mailsoftware,sortorder,daysdeletecompleted;
