@@ -23,6 +23,10 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent),ui(new U
   ui->setupUi(this);
   ui->comboBox_2->addItem("Delete");
   ui->comboBox_2->addItem("Archive");
+  ui->comboBox_3->addItem("Context");
+  ui->comboBox_3->addItem("Priority");
+  ui->comboBox_3->addItem("Due date");
+  ui->comboBox_3->addItem("Priority/days left");
   }
 //------------------------------------------------------------------------------
 PreferencesDialog::~PreferencesDialog() {
@@ -59,6 +63,10 @@ void PreferencesDialog::setDeleteDays(int days) {
   ui->lineEdit_2->setText(QString::number(days));
   }
 //------------------------------------------------------------------------------
+void PreferencesDialog::setSortOrder(int sorttype) {
+  ui->comboBox_3->setCurrentIndex(sorttype);
+  }
+//------------------------------------------------------------------------------
 QString PreferencesDialog::getFilePath() {
   return ui->lineEdit->text();
   }
@@ -73,6 +81,10 @@ bool PreferencesDialog::getArchiving() {
 //------------------------------------------------------------------------------
 int PreferencesDialog::getDeleteDays() {
   return ui->checkBox->checkState()?ui->lineEdit_2->text().toInt():0;
+  }
+//------------------------------------------------------------------------------
+int PreferencesDialog::getSortOrder() {
+  return ui->comboBox_3->currentIndex();
   }
 //------------------------------------------------------------------------------
 void PreferencesDialog::on_checkBox_stateChanged(int arg1) {

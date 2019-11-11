@@ -91,7 +91,7 @@ class MainWindow : public QMainWindow {
     private:
     Ui::MainWindow *ui;
     ToDo *maintodo;
-    int nmaintodo,mailsoftware,sortorder,daysdeletecompleted;
+    int nmaintodo,mailsoftware,sortorder,default_sortorder,daysdeletecompleted;
     bool nonprioritized,archiving;
     ToDoTag *project,*context;
     QString todofilepath;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>384</width>
-    <height>281</height>
+    <width>385</width>
+    <height>329</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>240</y>
+     <x>20</x>
+     <y>290</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -95,7 +95,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>130</y>
+     <y>190</y>
      <width>291</width>
      <height>101</height>
     </rect>
@@ -147,13 +147,36 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>130</y>
+     <y>190</y>
      <width>231</width>
      <height>22</height>
     </rect>
    </property>
    <property name="text">
     <string>Completed tasks</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>130</y>
+     <width>81</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sort by ...</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>150</y>
+     <width>271</width>
+     <height>27</height>
+    </rect>
    </property>
   </widget>
  </widget>

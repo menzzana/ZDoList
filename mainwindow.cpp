@@ -257,16 +257,19 @@ void MainWindow::preferences() {
   prefdialog.setSoftware(MAILSOFTWARE,mailsoftware);
   prefdialog.setArchiving(archiving);
   prefdialog.setDeleteDays(daysdeletecompleted);
+  prefdialog.setSortOrder(default_sortorder);
   if (prefdialog.exec()==QDialog::Accepted) {
     todofilepath=prefdialog.getFilePath();
     mailsoftware=prefdialog.getSoftware();
     archiving=prefdialog.getArchiving();
     daysdeletecompleted=prefdialog.getDeleteDays();
+    default_sortorder=prefdialog.getSortOrder();
     QSettings settings(QDir::currentPath()+INI_FILENAME, QSettings::IniFormat);
     settings.setValue("ToDoPath",todofilepath);
     settings.setValue("MailSoftware",mailsoftware);
     settings.setValue("Archiving",archiving);
     settings.setValue("DeleteDays",daysdeletecompleted);
+    settings.setValue("DefaultSortOrder",default_sortorder);
     }
   prefdialog.close();
   }
@@ -294,9 +297,11 @@ void MainWindow::loadTasks() {
   mailsoftware=settings.value("MailSoftware",0).toInt();
   archiving=settings.value("Archiving",true).toBool();
   daysdeletecompleted=settings.value("DeleteDays",0).toInt();
+  default_sortorder=settings.value("DefaultSortOrder",SORTORDER::DEFAULT).toInt();
   if (todofilepath.isEmpty())
     preferences();
   checkEmptyToDoFile();
+  sortorder=default_sortorder;
   nmaintodo=maintodo->load(getFileName(TODO_FILENAME),getFileName(DONE_FILENAME),&context,&project,archiving,daysdeletecompleted);
   drawAllTasks();
   }
