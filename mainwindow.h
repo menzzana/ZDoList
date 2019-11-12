@@ -85,7 +85,6 @@ class MainWindow : public QMainWindow {
     void on_actionSort_by_priority_triggered();
     void on_actionSort_by_due_date_triggered();
     void on_actionFilter_nonprioritized_triggered();
-
     void on_actionSort_by_priority_days_left_triggered();
 
     private:

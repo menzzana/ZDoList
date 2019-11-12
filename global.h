@@ -26,6 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 using namespace std;
 //------------------------------------------------------------------------------
+// Global constants
+//------------------------------------------------------------------------------
 const int MAXLABELWIDTHDIFF=10;
 const int MAXMAILBUTTONWIDTH=100;
 const int MAXPRIORITY=5;

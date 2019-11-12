@@ -99,7 +99,6 @@ void MainWindow::on_actionNew_task_triggered() {
         maintodo[nmaintodo].clear();
         maintodo[nmaintodo].description=sl2.at(1);
         maintodo[nmaintodo].url=sl2.at(0);
-        addToDo(&maintodo[nmaintodo]);
         nmaintodo++;
         }
       drawAllTasks();
@@ -108,7 +107,6 @@ void MainWindow::on_actionNew_task_triggered() {
       }
     maintodo[nmaintodo].clear();
     maintodo[nmaintodo].description=s1;
-    addToDo(&maintodo[nmaintodo]);
     nmaintodo++;
     drawAllTasks();
     checkAndSaveTasks();
@@ -129,7 +127,6 @@ void MainWindow::dropEvent(QDropEvent *event) {
     maintodo[nmaintodo].clear();
     maintodo[nmaintodo].description=s1;
     maintodo[nmaintodo].url=item.url();
-    addToDo(&maintodo[nmaintodo]);
     nmaintodo++;
     drawAllTasks();
     checkAndSaveTasks();
@@ -200,37 +197,21 @@ void MainWindow::ShowContextMenu(const QPoint &pos,ToDo *todo) {
   }
 //------------------------------------------------------------------------------
 void MainWindow::on_actionSort_by_context_triggered() {
-  ui->actionSort_by_context->setChecked(true);
-  ui->actionSort_by_priority->setChecked(false);
-  ui->actionSort_by_due_date->setChecked(false);
-  ui->actionSort_by_priority_days_left->setChecked(false);
   sortorder=SORTORDER::DEFAULT;
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
 void MainWindow::on_actionSort_by_priority_triggered() {
-  ui->actionSort_by_context->setChecked(false);
-  ui->actionSort_by_priority->setChecked(true);
-  ui->actionSort_by_due_date->setChecked(false);
-  ui->actionSort_by_priority_days_left->setChecked(false);
   sortorder=SORTORDER::PRIORITY;
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
 void MainWindow::on_actionSort_by_due_date_triggered() {
-  ui->actionSort_by_context->setChecked(false);
-  ui->actionSort_by_priority->setChecked(false);
-  ui->actionSort_by_due_date->setChecked(true);
-  ui->actionSort_by_priority_days_left->setChecked(false);
   sortorder=SORTORDER::DUEDATE;
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
 void MainWindow::on_actionSort_by_priority_days_left_triggered() {
-  ui->actionSort_by_context->setChecked(false);
-  ui->actionSort_by_priority->setChecked(false);
-  ui->actionSort_by_due_date->setChecked(false);
-  ui->actionSort_by_priority_days_left->setChecked(true);
   sortorder=SORTORDER::PRIORITYDAYSLEFT;
   drawAllTasks();
   }
@@ -396,20 +377,28 @@ void MainWindow::addToDo(ToDo *todo) {
 void MainWindow::drawAllTasks() {
   while (QLayoutItem *item=taskLayout->takeAt(0)) {
     Q_ASSERT(!item->layout());
-    delete item->widget();
+    //delete item->widget();
     delete item;
     }
+  ui->actionSort_by_context->setChecked(false);
+  ui->actionSort_by_priority->setChecked(false);
+  ui->actionSort_by_due_date->setChecked(false);
+  ui->actionSort_by_priority_days_left->setChecked(false);
   switch (sortorder) {
     case SORTORDER::DEFAULT:
+      ui->actionSort_by_context->setChecked(true);
       qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasks);
       break;
     case SORTORDER::PRIORITY:
+      ui->actionSort_by_priority->setChecked(true);
       qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasksPriority);
       break;
     case SORTORDER::DUEDATE:
+      ui->actionSort_by_due_date->setChecked(true);
       qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasksDueDate);
       break;
     case SORTORDER::PRIORITYDAYSLEFT:
+      ui->actionSort_by_priority_days_left->setChecked(true);
       qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasksPriorityDaysLeft);
       break;
     }
