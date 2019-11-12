@@ -377,7 +377,7 @@ void MainWindow::addToDo(ToDo *todo) {
 void MainWindow::drawAllTasks() {
   while (QLayoutItem *item=taskLayout->takeAt(0)) {
     Q_ASSERT(!item->layout());
-    //delete item->widget();
+    delete item->widget();
     delete item;
     }
   ui->actionSort_by_context->setChecked(false);
@@ -521,7 +521,7 @@ void MainWindow::deleteTask(ToDo *todo) {
     if (todo==&maintodo[i1])
       found=true;
     if (found)
-      memcpy(&maintodo[i1],&maintodo[i1+1],sizeof(ToDo));
+      maintodo[i1]=maintodo[i1+1];
     }
   maintodo[nmaintodo].clear();
   nmaintodo--;
