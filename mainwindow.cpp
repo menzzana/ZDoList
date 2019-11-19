@@ -92,18 +92,22 @@ void MainWindow::on_actionNew_task_triggered() {
 
   s1=QInputDialog::getText(this,"New task","Description:",QLineEdit::Normal,s1,&ok);
   if (ok) {
-    if (s1.startsWith("thunderlink:")) {
-      sl1=s1.split(" / ");
-      for (int i1=0; i1<sl1.size(); i1++)  {
-        sl2=sl1.at(i1).split("|");
-        maintodo[nmaintodo].clear();
-        maintodo[nmaintodo].description=sl2.at(1);
-        maintodo[nmaintodo].url=sl2.at(0);
-        nmaintodo++;
-        }
-      drawAllTasks();
-      checkAndSaveTasks();
-      return;
+    switch (mailsoftware) {
+      case THUNDERBIRD:
+        if (s1.startsWith("<A HREF=")) {
+          sl1=s1.split(" / ");
+          for (int i1=0; i1<sl1.size(); i1++)  {
+            sl2=sl1.at(i1).split("\">");
+            maintodo[nmaintodo].clear();
+            maintodo[nmaintodo].description=sl2.at(1).mid(0,sl2.at(1).indexOf('<'));
+            maintodo[nmaintodo].url=sl2.at(0).mid(9,-1);
+            nmaintodo++;
+            }
+          drawAllTasks();
+          checkAndSaveTasks();
+          return;
+          }
+        break;
       }
     maintodo[nmaintodo].clear();
     maintodo[nmaintodo].description=s1;

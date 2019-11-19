@@ -42,6 +42,7 @@ const QStringList PRIORITY_COLOR={
 const QStringList MAILSOFTWARE={
   "Thunderbird"
   };
+enum MAILORDER {THUNDERBIRD};
 enum SORTORDER {DEFAULT,PRIORITY,DUEDATE,PRIORITYDAYSLEFT};
 //------------------------------------------------------------------------------
 template<typename T> T *addEntry(T *first,QString description) {

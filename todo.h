@@ -48,6 +48,11 @@ class ToDo {
     static int compareTasksDueDate(const void *a,const void *b);
     static int compareTasksPriorityDaysLeft(const void *a,const void *b);
     int WeightedDaysLeft();
+    int checkCompleted(ToDo *todo,int *result);
+    int checkPriority(ToDo *todo,int *result);
+    int checkContext(ToDo *todo,int *result);
+    int checkProject(ToDo *todo,int *result);
+    int checkDueDate(ToDo *todo,int *result);
   };
 //------------------------------------------------------------------------------
 #endif // TODO_H

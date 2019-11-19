@@ -28,17 +28,16 @@ the *thunderlink* plugin.
 1. Goto **Add-ons**
 1. Search for *Thunderlink*
 1. Install the software
-1. Goto **Add-ons** preferences
-1. Change the *string 7* to *ZDoList* in first
-   textbox
-   and then in multi-row textbox
+1. **Add-ons** preferences does not work well in later version
+1. Use *clickable subject* which has the format
 
-     \<thunderlink\>|\<subject\>
+   \<A HREF="\<thunderlink\>">\<subject\>\</A\>
+1. *clickable subject* has also the shortcut *CTRL+ALT+5*
 
 ### Using Thunderlink
 
 1. If you followed instructions you can then copy the thunderlink
-   using *CTRL+ALT+7*
+   using *CTRL+ALT+5*
 1. When creating new new task do so as normal BUT paste from clipboard directly into the *new task* textbox.
 1. The software should automatically detect that this is a task from thunderbird
 

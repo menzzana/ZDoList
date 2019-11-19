@@ -166,28 +166,16 @@ int ToDo::compareTasks(const void *a,const void *b) {
   ToDo *todob=(ToDo *)b;
   int comp_result;
 
-  if ((todoa->context==nullptr)^(todob->context==nullptr))
-    return todoa->context==nullptr?1:-1;
-  if (todoa->context!=nullptr && todob->context!=nullptr) {
-    comp_result=(todoa->context->description.compare(todob->context->description));
-    if (comp_result!=0)
-      return comp_result;
-    }
-  if ((todoa->project==nullptr)^(todob->project==nullptr))
-    return todoa->project==nullptr?1:-1;
-  if (todoa->project!=nullptr && todob->project!=nullptr) {
-    comp_result=(todoa->project->description.compare(todob->project->description));
-    if (comp_result!=0)
-      return comp_result;
-    }
-  if (todoa->completed!=todob->completed)
-    return todoa->completed?1:-1;
-  if (todoa->priority!=todob->priority)
-    return todoa->priority==0?1:todob->priority==0?-1:todoa->priority-todob->priority;
-  if (todoa->due.isValid() && todob->due.isValid())
-    return (todoa->due<todob->due?-1:1);
-  if (todoa->due.isValid() || todob->due.isValid())
-    return todoa->due.isValid()?-1:1;
+  if (todoa->checkContext(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkProject(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkCompleted(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkPriority(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkDueDate(todob,&comp_result)!=0)
+    return comp_result;
   return todoa->description.compare(todob->description);
   }
 //------------------------------------------------------------------------------
@@ -196,28 +184,16 @@ int ToDo::compareTasksPriority(const void *a,const void *b) {
   ToDo *todob=(ToDo *)b;
   int comp_result;
 
-  if (todoa->completed!=todob->completed)
-    return todoa->completed?1:-1;
-  if (todoa->priority!=todob->priority)
-    return todoa->priority==0?1:todob->priority==0?-1:todoa->priority-todob->priority;
-  if (todoa->due.isValid() && todob->due.isValid())
-    return (todoa->due<todob->due?-1:1);
-  if (todoa->due.isValid() || todob->due.isValid())
-    return todoa->due.isValid()?-1:1;
-  if ((todoa->context==nullptr)^(todob->context==nullptr))
-    return todoa->context==nullptr?1:-1;
-  if (todoa->context!=nullptr && todob->context!=nullptr) {
-    comp_result=(todoa->context->description.compare(todob->context->description));
-    if (comp_result!=0)
-      return comp_result;
-    }
-  if ((todoa->project==nullptr)^(todob->project==nullptr))
-    return todoa->project==nullptr?1:-1;
-  if (todoa->project!=nullptr && todob->project!=nullptr) {
-    comp_result=(todoa->project->description.compare(todob->project->description));
-    if (comp_result!=0)
-      return comp_result;
-    }
+  if (todoa->checkCompleted(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkPriority(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkDueDate(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkContext(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkProject(todob,&comp_result)!=0)
+    return comp_result;
   return todoa->description.compare(todob->description);
   }
 //------------------------------------------------------------------------------
@@ -226,56 +202,36 @@ int ToDo::compareTasksDueDate(const void *a,const void *b) {
   ToDo *todob=(ToDo *)b;
   int comp_result;
 
-  if (todoa->completed!=todob->completed)
-    return todoa->completed?1:-1;
-  if (todoa->due.isValid() && todob->due.isValid())
-    return (todoa->due<todob->due?-1:1);
-  if (todoa->due.isValid() || todob->due.isValid())
-    return todoa->due.isValid()?-1:1;
-  if ((todoa->context==nullptr)^(todob->context==nullptr))
-    return todoa->context==nullptr?1:-1;
-  if (todoa->context!=nullptr && todob->context!=nullptr) {
-    comp_result=(todoa->context->description.compare(todob->context->description));
-    if (comp_result!=0)
-      return comp_result;
-    }
-  if ((todoa->project==nullptr)^(todob->project==nullptr))
-    return todoa->project==nullptr?1:-1;
-  if (todoa->project!=nullptr && todob->project!=nullptr) {
-    comp_result=(todoa->project->description.compare(todob->project->description));
-    if (comp_result!=0)
-      return comp_result;
-    }
+  if (todoa->checkCompleted(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkDueDate(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkPriority(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkContext(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkProject(todob,&comp_result)!=0)
+    return comp_result;
   return todoa->description.compare(todob->description);
   }
 //------------------------------------------------------------------------------
 int ToDo::compareTasksPriorityDaysLeft(const void *a,const void *b) {
   ToDo *todoa=(ToDo *)a;
   ToDo *todob=(ToDo *)b;
-  int diff,comp_result;
+  int comp_result;
 
-  if (todoa->completed!=todob->completed)
-    return todoa->completed?1:-1;
-  diff=(todoa->priority==0?MAXPRIORITY:todoa->priority)
+  if (todoa->checkCompleted(todob,&comp_result)!=0)
+    return comp_result;
+  comp_result=(todoa->priority==0?MAXPRIORITY:todoa->priority)
          +todoa->WeightedDaysLeft()
          -(todob->priority==0?MAXPRIORITY:todob->priority)
          -todob->WeightedDaysLeft();
-  if (diff!=0)
-    return diff;
-  if ((todoa->context==nullptr)^(todob->context==nullptr))
-    return todoa->context==nullptr?1:-1;
-  if (todoa->context!=nullptr && todob->context!=nullptr) {
-    comp_result=(todoa->context->description.compare(todob->context->description));
-    if (comp_result!=0)
-      return comp_result;
-    }
-  if ((todoa->project==nullptr)^(todob->project==nullptr))
-    return todoa->project==nullptr?1:-1;
-  if (todoa->project!=nullptr && todob->project!=nullptr) {
-    comp_result=(todoa->project->description.compare(todob->project->description));
-    if (comp_result!=0)
-      return comp_result;
-    }
+  if (comp_result!=0)
+    return comp_result;
+  if (todoa->checkContext(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkProject(todob,&comp_result)!=0)
+    return comp_result;
   return todoa->description.compare(todob->description);
   }
 //------------------------------------------------------------------------------
@@ -286,5 +242,36 @@ int ToDo::WeightedDaysLeft() {
     return MAXPRIORITY;
   daysleft=static_cast<int>((this->due.toJulianDay()-QDate::currentDate().toJulianDay())/DAYSPERPRIO);
   return min(max(daysleft,0),MAXPRIORITY);
+  }
+//------------------------------------------------------------------------------
+int ToDo::checkCompleted(ToDo *todo,int *result) {
+  return *result=(this->completed==todo->completed?0:this->completed?1:-1);
+  }
+//------------------------------------------------------------------------------
+int ToDo::checkPriority(ToDo *todo,int *result) {
+  return *result=(this->priority==todo->priority?0:
+                 this->priority==0?1:todo->priority==0?-1:
+                 this->priority-todo->priority);
+  }
+//------------------------------------------------------------------------------
+int ToDo::checkContext(ToDo *todo,int *result) {
+  if (this->context==nullptr || todo->context==nullptr)
+    return *result=(this->context==todo->context?0:
+                   this->context==nullptr?1:-1);
+  return *result=(this->context->description.compare(todo->context->description));
+  }
+//------------------------------------------------------------------------------
+int ToDo::checkProject(ToDo *todo,int *result) {
+  if (this->project==nullptr || todo->project==nullptr)
+    return *result=(this->project==todo->project?0:
+                   this->project==nullptr?1:-1);
+  return *result=(this->project->description.compare(todo->project->description));
+  }
+//------------------------------------------------------------------------------
+int ToDo::checkDueDate(ToDo *todo,int *result) {
+  if (!this->due.isValid() || !todo->due.isValid())
+    return *result=(this->due.isValid()==todo->due.isValid()?
+                   0:this->due.isValid()?-1:1);
+  return *result=(this->due<todo->due?-1:1);
   }
 //------------------------------------------------------------------------------
