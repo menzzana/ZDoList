@@ -235,6 +235,11 @@ string MainWindow::getFileName(QString filename) {
   return (todofilepath+filename).toStdString();
   }
 //------------------------------------------------------------------------------
+void MainWindow::setWidgetSize(QPushButton *button) {
+  QFontMetrics fm(button->font());
+  button->setMaximumWidth(fm.horizontalAdvance(button->text())+MAXLABELWIDTHDIFF);
+  }
+//------------------------------------------------------------------------------
 void MainWindow::preferences() {
   PreferencesDialog prefdialog;
 
@@ -298,6 +303,7 @@ void MainWindow::saveTasks() {
 void MainWindow::addToDo(ToDo *todo) {
   QFrame *frame;
   QGridLayout *myLayout;
+  QHBoxLayout *bottomLayout;
   QLabel *label;
   QCheckBox *checkbox;
   QPushButton *button;
@@ -347,6 +353,18 @@ void MainWindow::addToDo(ToDo *todo) {
     }
   if (todo->context!=nullptr || todo->project!=nullptr)
     row++;
+  frame=new QFrame();
+  frame->setFrameShape(QFrame::NoFrame);
+  bottomLayout=new QHBoxLayout();
+  bottomLayout->setContentsMargins(0,0,0,0);
+  frame->setLayout(bottomLayout);
+  if (todo->priority>0) {
+    label=new QLabel();
+    label->setFont(QFont("Ubuntu",9));
+    label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
+    label->setText(setTextColor("<b>"+QString(char(todo->priority+64))+"</b>","black"));
+    bottomLayout->addWidget(label);
+    }
   if (todo->due.isValid()) {
     label=new QLabel();
     label->setFont(QFont("Ubuntu",9));
@@ -356,26 +374,22 @@ void MainWindow::addToDo(ToDo *todo) {
       duecolor="black";
     label->setText(setTextColor(todo->due.toString("yyyy-MM-dd"),duecolor));
     label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
-    myLayout->addWidget(label,row,0,1,1);
-    }
-  if (todo->priority>0) {
-    label=new QLabel();
-    label->setFont(QFont("Ubuntu",9));
-    label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
-    label->setText(setTextColor(QString(char(todo->priority+64)),"black"));
-    myLayout->addWidget(label,row,2,1,1);
+    bottomLayout->addWidget(label);
     }
   if (!todo->url.isEmpty()) {
     button=new QPushButton();
     button->setFont(QFont("Ubuntu",9));
-    button->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
     button->setText("Mail");
-    myLayout->addWidget(button,row,1,1,1);
+    bottomLayout->addWidget(button);
     connect(button,&QPushButton::clicked,[=] () {
         gotoMail(todo);
         }
       );
     }
+  if (bottomLayout->count()>0)
+    myLayout->addWidget(frame,row,0,1,1);
+  else
+    delete frame;
   }
 //------------------------------------------------------------------------------
 void MainWindow::drawAllTasks() {
