@@ -235,11 +235,6 @@ string MainWindow::getFileName(QString filename) {
   return (todofilepath+filename).toStdString();
   }
 //------------------------------------------------------------------------------
-void MainWindow::setWidgetSize(QPushButton *button) {
-  QFontMetrics fm(button->font());
-  button->setMaximumWidth(fm.horizontalAdvance(button->text())+MAXLABELWIDTHDIFF);
-  }
-//------------------------------------------------------------------------------
 void MainWindow::preferences() {
   PreferencesDialog prefdialog;
 

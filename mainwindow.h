@@ -71,7 +71,6 @@ class MainWindow : public QMainWindow {
     void setCompleted(QCheckBox *checkbox,ToDo *todo);
     QString setTextColor(QString text,QString htmlfontcolor);
     string getFileName(QString filename);
-    void setWidgetSize(QPushButton *button);
 
   private slots:
     void on_actionExit_triggered();
