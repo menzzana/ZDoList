@@ -36,12 +36,14 @@ class PreferencesDialog : public QDialog {
     void setSoftware(QStringList softwarelist,int softwareindex);
     void setArchiving(bool archiving);
     void setDeleteDays(int days);
+    void setGroupProject(bool groupproject);
     void setSortOrder(int sorttype);
     QString getFilePath();
     int getSoftware();
     bool getArchiving();
     int getDeleteDays();
     int getSortOrder();
+    bool getGroupProject();
 
   private slots:
     void on_pushButton_clicked();

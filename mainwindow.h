@@ -86,12 +86,13 @@ class MainWindow : public QMainWindow {
     void on_actionSort_by_due_date_triggered();
     void on_actionFilter_nonprioritized_triggered();
     void on_actionSort_by_priority_days_left_triggered();
+    void on_actionGroup_Projects_triggered();
 
     private:
     Ui::MainWindow *ui;
     ToDo *maintodo;
     int nmaintodo,mailsoftware,sortorder,default_sortorder,daysdeletecompleted;
-    bool nonprioritized,archiving;
+    bool nonprioritized,archiving,groupproject,default_groupproject;
     ToDoTag *project,*context;
     QString todofilepath;
     QWidget *taskWidget;

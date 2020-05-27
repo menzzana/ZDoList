@@ -34,10 +34,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   project=context=nullptr;
   maintodo=new ToDo[MAXTASKS];
   nmaintodo=mailsoftware=daysdeletecompleted=0;
-  sortorder=SORTORDER::DEFAULT;
+  default_sortorder=sortorder=SORTORDER::DEFAULT;
   todofilepath="";
   nonprioritized=false;
   archiving=true;
+  default_groupproject=groupproject=false;
   loadTasks();
   }
 //------------------------------------------------------------------------------
@@ -220,6 +221,11 @@ void MainWindow::on_actionSort_by_priority_days_left_triggered() {
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
+void MainWindow::on_actionGroup_Projects_triggered() {
+  groupproject=ui->actionGroup_Projects->isChecked();
+  drawAllTasks();
+  }
+//------------------------------------------------------------------------------
 void MainWindow::on_actionFilter_nonprioritized_triggered() {
   nonprioritized=ui->actionFilter_nonprioritized->isChecked();
   drawAllTasks();
@@ -242,11 +248,13 @@ void MainWindow::preferences() {
   prefdialog.setSoftware(MAILSOFTWARE,mailsoftware);
   prefdialog.setArchiving(archiving);
   prefdialog.setDeleteDays(daysdeletecompleted);
+  prefdialog.setGroupProject(default_groupproject);
   prefdialog.setSortOrder(default_sortorder);
   if (prefdialog.exec()==QDialog::Accepted) {
     todofilepath=prefdialog.getFilePath();
     mailsoftware=prefdialog.getSoftware();
     archiving=prefdialog.getArchiving();
+    default_groupproject=prefdialog.getGroupProject();
     daysdeletecompleted=prefdialog.getDeleteDays();
     default_sortorder=prefdialog.getSortOrder();
     QSettings settings(QDir::currentPath()+INI_FILENAME, QSettings::IniFormat);
@@ -254,6 +262,7 @@ void MainWindow::preferences() {
     settings.setValue("MailSoftware",mailsoftware);
     settings.setValue("Archiving",archiving);
     settings.setValue("DeleteDays",daysdeletecompleted);
+    settings.setValue("GroupProject",groupproject);
     settings.setValue("DefaultSortOrder",default_sortorder);
     }
   prefdialog.close();
@@ -278,15 +287,17 @@ void MainWindow::checkEmptyToDoFile() {
 //------------------------------------------------------------------------------
 void MainWindow::loadTasks() {
   QSettings settings(QDir::currentPath()+INI_FILENAME, QSettings::IniFormat);
-  todofilepath=settings.value("ToDoPath","").toString();
-  mailsoftware=settings.value("MailSoftware",0).toInt();
-  archiving=settings.value("Archiving",true).toBool();
-  daysdeletecompleted=settings.value("DeleteDays",0).toInt();
-  default_sortorder=settings.value("DefaultSortOrder",SORTORDER::DEFAULT).toInt();
+  todofilepath=settings.value("ToDoPath",todofilepath).toString();
+  mailsoftware=settings.value("MailSoftware",mailsoftware).toInt();
+  archiving=settings.value("Archiving",archiving).toBool();
+  default_groupproject=settings.value("GroupProject",groupproject).toBool();
+  daysdeletecompleted=settings.value("DeleteDays",daysdeletecompleted).toInt();
+  default_sortorder=settings.value("DefaultSortOrder",default_sortorder).toInt();
   if (todofilepath.isEmpty())
     preferences();
   checkEmptyToDoFile();
   sortorder=default_sortorder;
+  groupproject=default_groupproject;
   nmaintodo=maintodo->load(getFileName(TODO_FILENAME),getFileName(DONE_FILENAME),&context,&project,archiving,daysdeletecompleted);
   drawAllTasks();
   }
@@ -415,6 +426,18 @@ void MainWindow::drawAllTasks() {
       qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasksPriorityDaysLeft);
       break;
     }
+  ui->actionGroup_Projects->setChecked(groupproject);
+  if (groupproject)
+    for (int i1=0; i1<nmaintodo; i1++)
+      if (maintodo[i1].project!=nullptr)
+        for (int i2=i1+2; i2<nmaintodo; i2++) {
+          if (maintodo[i2].project==nullptr)
+            continue;
+          if (maintodo[i1].project->description.compare(maintodo[i2].project->description)!=0)
+            continue;
+          shiftInsert(maintodo,i1+1,i2);
+          break;
+          }
   for (int i1=0; i1<nmaintodo; i1++)
     if (!nonprioritized || (maintodo[i1].priority==0 && !maintodo[i1].completed))
       addToDo(&maintodo[i1]);
