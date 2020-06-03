@@ -430,12 +430,12 @@ void MainWindow::drawAllTasks() {
   if (groupproject)
     for (int i1=0; i1<nmaintodo; i1++)
       if (maintodo[i1].project!=nullptr)
-        for (int i2=i1+2; i2<nmaintodo; i2++) {
+        for (int i2=i1+1; i2<nmaintodo; i2++) {
           if (maintodo[i2].project==nullptr)
             continue;
           if (maintodo[i1].project->description.compare(maintodo[i2].project->description)!=0)
             continue;
-          shiftInsert(maintodo,i1+1,i2);
+          shiftInsert(maintodo,i2,i1+1);
           break;
           }
   for (int i1=0; i1<nmaintodo; i1++)

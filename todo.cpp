@@ -228,6 +228,10 @@ int ToDo::compareTasksPriorityDaysLeft(const void *a,const void *b) {
          -todob->WeightedDaysLeft();
   if (comp_result!=0)
     return comp_result;
+  if (todoa->checkPriority(todob,&comp_result)!=0)
+    return comp_result;
+  if (todoa->checkDueDate(todob,&comp_result)!=0)
+    return comp_result;
   if (todoa->checkContext(todob,&comp_result)!=0)
     return comp_result;
   if (todoa->checkProject(todob,&comp_result)!=0)
