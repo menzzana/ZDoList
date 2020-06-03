@@ -65,6 +65,11 @@ void PreferencesDialog::setDeleteDays(int days) {
 //------------------------------------------------------------------------------
 void PreferencesDialog::setGroupProject(bool groupproject) {
   ui->checkBox_2->setChecked(groupproject);
+  ui->checkBox_3->setEnabled(ui->checkBox_2->checkState());
+  }
+//------------------------------------------------------------------------------
+void PreferencesDialog::setCollapsed(bool collapsed) {
+  ui->checkBox_3->setChecked(collapsed);
   }
 //------------------------------------------------------------------------------
 void PreferencesDialog::setSortOrder(int sorttype) {
@@ -95,7 +100,16 @@ bool PreferencesDialog::getGroupProject() {
   return ui->checkBox_2->checkState();
   }
 //------------------------------------------------------------------------------
+bool PreferencesDialog::getCollapsed() {
+  return ui->checkBox_3->checkState();
+  }
+//------------------------------------------------------------------------------
 void PreferencesDialog::on_checkBox_stateChanged(int arg1) {
   ui->groupBox->setEnabled(arg1);
   }
 //------------------------------------------------------------------------------
+void PreferencesDialog::on_checkBox_2_stateChanged(int arg1) {
+  ui->checkBox_3->setEnabled(ui->checkBox_2->checkState());
+  }
+//------------------------------------------------------------------------------
+

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>385</width>
-    <height>365</height>
+    <height>397</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>330</y>
+     <y>360</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -95,7 +95,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>220</y>
+     <y>250</y>
      <width>291</width>
      <height>101</height>
     </rect>
@@ -133,7 +133,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>40</y>
+      <y>30</y>
       <width>81</width>
       <height>17</height>
      </rect>
@@ -147,7 +147,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>220</y>
+     <y>250</y>
      <width>231</width>
      <height>22</height>
     </rect>
@@ -190,6 +190,19 @@
    </property>
    <property name="text">
     <string>Group by project as default</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>220</y>
+     <width>201</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Collapsed projects as default</string>
    </property>
   </widget>
  </widget>

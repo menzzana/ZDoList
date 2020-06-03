@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   nonprioritized=false;
   archiving=true;
   default_groupproject=groupproject=false;
+  default_collapsed=collapsed=false;
   loadTasks();
   }
 //------------------------------------------------------------------------------
@@ -223,11 +224,29 @@ void MainWindow::on_actionSort_by_priority_days_left_triggered() {
 //------------------------------------------------------------------------------
 void MainWindow::on_actionGroup_Projects_triggered() {
   groupproject=ui->actionGroup_Projects->isChecked();
+  if (!groupproject)
+    collapsed=false;
+  ui->actionCollapsed->setEnabled(groupproject);
+  ui->actionExpanded->setEnabled(groupproject);
+  ui->actionExpanded->setChecked(!collapsed);
+  ui->actionCollapsed->setChecked(collapsed);
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
 void MainWindow::on_actionFilter_nonprioritized_triggered() {
   nonprioritized=ui->actionFilter_nonprioritized->isChecked();
+  drawAllTasks();
+  }
+//------------------------------------------------------------------------------
+void MainWindow::on_actionCollapsed_triggered() {
+  collapsed=ui->actionCollapsed->isChecked();
+  ui->actionExpanded->setChecked(!collapsed);
+  drawAllTasks();
+  }
+//------------------------------------------------------------------------------
+void MainWindow::on_actionExpanded_triggered() {
+  collapsed=!ui->actionExpanded->isChecked();
+  ui->actionCollapsed->setChecked(collapsed);
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
@@ -249,12 +268,14 @@ void MainWindow::preferences() {
   prefdialog.setArchiving(archiving);
   prefdialog.setDeleteDays(daysdeletecompleted);
   prefdialog.setGroupProject(default_groupproject);
+  prefdialog.setCollapsed(default_collapsed);
   prefdialog.setSortOrder(default_sortorder);
   if (prefdialog.exec()==QDialog::Accepted) {
     todofilepath=prefdialog.getFilePath();
     mailsoftware=prefdialog.getSoftware();
     archiving=prefdialog.getArchiving();
     default_groupproject=prefdialog.getGroupProject();
+    default_collapsed=prefdialog.getCollapsed();
     daysdeletecompleted=prefdialog.getDeleteDays();
     default_sortorder=prefdialog.getSortOrder();
     QSettings settings(QDir::currentPath()+INI_FILENAME, QSettings::IniFormat);
@@ -263,6 +284,7 @@ void MainWindow::preferences() {
     settings.setValue("Archiving",archiving);
     settings.setValue("DeleteDays",daysdeletecompleted);
     settings.setValue("GroupProject",groupproject);
+    settings.setValue("Collapsed",collapsed);
     settings.setValue("DefaultSortOrder",default_sortorder);
     }
   prefdialog.close();
@@ -298,6 +320,7 @@ void MainWindow::loadTasks() {
   checkEmptyToDoFile();
   sortorder=default_sortorder;
   groupproject=default_groupproject;
+  collapsed=default_collapsed;
   nmaintodo=maintodo->load(getFileName(TODO_FILENAME),getFileName(DONE_FILENAME),&context,&project,archiving,daysdeletecompleted);
   drawAllTasks();
   }
@@ -313,8 +336,8 @@ void MainWindow::addToDo(ToDo *todo) {
   QLabel *label;
   QCheckBox *checkbox;
   QPushButton *button;
-  QString duecolor;
-  int row;
+  QString duecolor,projecttext;
+  int row,i1,nfound;
 
   frame=new QFrame();
   frame->setFrameShape(QFrame::Box);
@@ -353,7 +376,19 @@ void MainWindow::addToDo(ToDo *todo) {
   if (todo->project!=nullptr) {
     label=new QLabel();
     label->setFont(QFont("Ubuntu",9));
-    label->setText(setTextColor("+"+todo->project->description,"darkblue"));
+    projecttext=setTextColor("+"+todo->project->description,"darkblue");
+    if (collapsed) {
+      for (i1=0; &maintodo[i1]!=todo; i1++);
+      for (nfound=0; i1<nmaintodo; i1++) {
+        if (maintodo[i1].project==nullptr)
+          break;
+        if (maintodo[i1].project->description.compare(todo->project->description)!=0)
+          break;
+        nfound++;
+        }
+      projecttext=projecttext+" <b>("+QString::number(nfound)+")</b>";
+      }
+    label->setText(projecttext);
     label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
     myLayout->addWidget(label,row,1,1,2);
     }
@@ -399,6 +434,8 @@ void MainWindow::addToDo(ToDo *todo) {
   }
 //------------------------------------------------------------------------------
 void MainWindow::drawAllTasks() {
+  QString projectname;
+
   while (QLayoutItem *item=taskLayout->takeAt(0)) {
     Q_ASSERT(!item->layout());
     delete item->widget();
@@ -438,9 +475,16 @@ void MainWindow::drawAllTasks() {
           shiftInsert(maintodo,i2,i1+1);
           break;
           }
-  for (int i1=0; i1<nmaintodo; i1++)
+  projectname="";
+  for (int i1=0; i1<nmaintodo; i1++) {
+    if (maintodo[i1].project!=nullptr) {
+      if (maintodo[i1].project->description.compare(projectname)==0 && collapsed)
+        continue;
+      projectname=maintodo[i1].project->description;
+      }
     if (!nonprioritized || (maintodo[i1].priority==0 && !maintodo[i1].completed))
       addToDo(&maintodo[i1]);
+    }
   }
 //------------------------------------------------------------------------------
 void MainWindow::gotoMail(ToDo *todo) {

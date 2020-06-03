@@ -66,6 +66,9 @@
     <addaction name="actionSort_by_priority_days_left"/>
     <addaction name="actionFilter_nonprioritized"/>
     <addaction name="actionGroup_Projects"/>
+    <addaction name="separator"/>
+    <addaction name="actionCollapsed"/>
+    <addaction name="actionExpanded"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -165,6 +168,25 @@
    </property>
    <property name="text">
     <string>Group Projects</string>
+   </property>
+  </action>
+  <action name="actionCollapsed">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Collapsed</string>
+   </property>
+  </action>
+  <action name="actionExpanded">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Expanded</string>
    </property>
   </action>
  </widget>

@@ -37,6 +37,7 @@ class PreferencesDialog : public QDialog {
     void setArchiving(bool archiving);
     void setDeleteDays(int days);
     void setGroupProject(bool groupproject);
+    void setCollapsed(bool collapsed);
     void setSortOrder(int sorttype);
     QString getFilePath();
     int getSoftware();
@@ -44,12 +45,14 @@ class PreferencesDialog : public QDialog {
     int getDeleteDays();
     int getSortOrder();
     bool getGroupProject();
+    bool getCollapsed();
 
   private slots:
     void on_pushButton_clicked();
     void on_checkBox_stateChanged(int arg1);
+    void on_checkBox_2_stateChanged(int arg1);
 
-private:
+    private:
     Ui::PreferencesDialog *ui;
   };
 //------------------------------------------------------------------------------
