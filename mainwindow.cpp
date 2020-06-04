@@ -336,7 +336,7 @@ void MainWindow::addToDo(ToDo *todo) {
   QLabel *label;
   QCheckBox *checkbox;
   QPushButton *button;
-  QString duecolor,projecttext;
+  QString duecolor,projecttext,framestyle;
   int row,i1,nfound;
 
   frame=new QFrame();
@@ -352,12 +352,13 @@ void MainWindow::addToDo(ToDo *todo) {
   row=0;
   checkbox=new QCheckBox();
   checkbox->setFont(QFont("Ubuntu",9));
+  framestyle="color: black;";
   if (todo->completed) {
     checkbox->setChecked(true);
-    frame->setStyleSheet("color: black; background-color: lightgreen");
+    framestyle=framestyle+"background-color: lightgreen";
     }
   else
-    frame->setStyleSheet("color: black; background-color: "+PRIORITY_COLOR.at(todo->priority));
+    framestyle=framestyle+"background-color: "+PRIORITY_COLOR.at(todo->priority);
   checkbox->setText(todo->description);
   checkbox->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
   connect(checkbox,&QCheckBox::stateChanged,[=] () {
@@ -387,6 +388,7 @@ void MainWindow::addToDo(ToDo *todo) {
         nfound++;
         }
       projecttext=projecttext+" <b>("+QString::number(nfound)+")</b>";
+      framestyle="border-style: outset;border-color:darkblue; border-left-width: 4px;"+framestyle;
       }
     label->setText(projecttext);
     label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
@@ -394,7 +396,9 @@ void MainWindow::addToDo(ToDo *todo) {
     }
   if (todo->context!=nullptr || todo->project!=nullptr)
     row++;
+  frame->setStyleSheet(".QFrame {"+framestyle+"}");
   frame=new QFrame();
+  frame->setStyleSheet(".QFrame {border-style: default;color: black;}");
   frame->setFrameShape(QFrame::NoFrame);
   bottomLayout=new QHBoxLayout();
   bottomLayout->setContentsMargins(0,0,0,0);
