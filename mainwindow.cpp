@@ -283,8 +283,8 @@ void MainWindow::preferences() {
     settings.setValue("MailSoftware",mailsoftware);
     settings.setValue("Archiving",archiving);
     settings.setValue("DeleteDays",daysdeletecompleted);
-    settings.setValue("GroupProject",groupproject);
-    settings.setValue("Collapsed",collapsed);
+    settings.setValue("GroupProject",default_groupproject);
+    settings.setValue("Collapsed",default_collapsed);
     settings.setValue("DefaultSortOrder",default_sortorder);
     }
   prefdialog.close();
@@ -472,7 +472,7 @@ void MainWindow::drawAllTasks() {
             continue;
           if (maintodo[i1].project->description.compare(maintodo[i2].project->description)!=0)
             continue;
-          shiftInsert(maintodo,i2,i1+1);
+          shiftInsert(maintodo,i1+1,i2);
           break;
           }
   projectname="";
@@ -482,6 +482,8 @@ void MainWindow::drawAllTasks() {
         continue;
       projectname=maintodo[i1].project->description;
       }
+    else
+      projectname="";
     if (!nonprioritized || (maintodo[i1].priority==0 && !maintodo[i1].completed))
       addToDo(&maintodo[i1]);
     }

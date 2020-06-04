@@ -72,7 +72,7 @@ template<typename T> void shiftInsert(T *first,int dest,int src) {
   if (abs(dest-src)<2)
     return;
   tl=first[src];
-  for (int i1=src-1; i1>dest; i1--)
+  for (int i1=src-1; i1>=dest; i1--)
     first[i1+1]=first[i1];
   first[dest]=tl;
   }
