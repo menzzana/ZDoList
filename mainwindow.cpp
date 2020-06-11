@@ -312,7 +312,8 @@ void MainWindow::loadTasks() {
   todofilepath=settings.value("ToDoPath",todofilepath).toString();
   mailsoftware=settings.value("MailSoftware",mailsoftware).toInt();
   archiving=settings.value("Archiving",archiving).toBool();
-  default_groupproject=settings.value("GroupProject",groupproject).toBool();
+  default_groupproject=settings.value("GroupProject",default_groupproject).toBool();
+  default_collapsed=settings.value("Collapsed",default_collapsed).toBool();
   daysdeletecompleted=settings.value("DeleteDays",daysdeletecompleted).toInt();
   default_sortorder=settings.value("DefaultSortOrder",default_sortorder).toInt();
   if (todofilepath.isEmpty())
