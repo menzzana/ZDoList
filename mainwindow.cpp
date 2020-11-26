@@ -413,7 +413,7 @@ QString MainWindow::getProjectColor(ToDoTag *projecttag) {
   for (tdt1=project,i1=0; tdt1!=nullptr; tdt1=tdt1->Next,i1++)
     if (projecttag==tdt1)
       break;
-  return PROJECT_COLOR.at(i1);
+  return PROJECT_COLOR.at(i1%PROJECT_COLOR.length());
   }
 //------------------------------------------------------------------------------
 void MainWindow::drawAllTasks() {
