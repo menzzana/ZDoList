@@ -39,6 +39,9 @@ const QString INI_FILENAME="/ZDoList.ini";
 const QStringList PRIORITY_COLOR={
   "white","#ffafaf","#f0bfbf","#f0cfcf","#f0dfdf","#ffefef"
   };
+const QStringList PROJECT_COLOR={
+  "Maroon","Olive","Teal","Navy","Purple","Silver","Aqua","Gray","Blue","DarkMagenta"
+  };
 const QStringList MAILSOFTWARE={
   "Thunderbird"
   };

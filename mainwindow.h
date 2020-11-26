@@ -61,6 +61,7 @@ class MainWindow : public QMainWindow {
     void saveTasks();
     void addToDo(ToDo *todo,bool firstentry);
     QHBoxLayout *addLayout(QVBoxLayout *vlayout);
+    QString getProjectColor(ToDoTag *projecttag);
     void drawAllTasks();
     void gotoMail(ToDo *todo);
     void setProject(ToDo *todo);

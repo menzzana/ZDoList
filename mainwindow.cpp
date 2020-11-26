@@ -306,6 +306,7 @@ void MainWindow::addToDo(ToDo *todo,bool firstentry) {
   frame->setFrameShape(QFrame::Box);
   vlayout=new QVBoxLayout();
   frame->setLayout(vlayout);
+  framestyle="color: black;";
   taskLayout->addWidget(frame);
   frame->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(frame,&QFrame::customContextMenuRequested,[=](const QPoint &pos) {
@@ -313,21 +314,23 @@ void MainWindow::addToDo(ToDo *todo,bool firstentry) {
       }
     );
   hlayout=addLayout(vlayout);
-  if (firstentry && todo->project!=nullptr) {
-    button=new QPushButton();
-    button->setFixedWidth(15);
-    button->setFixedHeight(15);
-    button->setFont(QFont("Ubuntu",9));
-    button->setText(todo->collapsed?"+":"-");
-    connect(button,&QPushButton::clicked,[=] () {
-        toggleCollapsed(todo);
-        }
-      );
-    hlayout->addWidget(button);
+  if (todo->project!=nullptr) {
+    framestyle="border-style: outset;border-color:"+getProjectColor(todo->project)+"; border-left-width: 4px;"+framestyle;
+    if (firstentry && todo->project!=nullptr) {
+      button=new QPushButton();
+      button->setFixedWidth(15);
+      button->setFixedHeight(15);
+      button->setFont(QFont("Ubuntu",9));
+      button->setText(todo->collapsed?"+":"-");
+      connect(button,&QPushButton::clicked,[=] () {
+          toggleCollapsed(todo);
+          }
+        );
+      hlayout->addWidget(button);
+      }
     }
   checkbox=new QCheckBox();
   checkbox->setFont(QFont("Ubuntu",9));
-  framestyle="color: black;";
   if (todo->completed) {
     checkbox->setChecked(true);
     framestyle=framestyle+"background-color: lightgreen";
@@ -401,6 +404,16 @@ QHBoxLayout *MainWindow::addLayout(QVBoxLayout *vlayout) {
   frame->setLayout(hlayout);
   vlayout->addWidget(frame);
   return hlayout;
+  }
+//------------------------------------------------------------------------------
+QString MainWindow::getProjectColor(ToDoTag *projecttag) {
+  ToDoTag *tdt1;
+  int i1;
+
+  for (tdt1=project,i1=0; tdt1!=nullptr; tdt1=tdt1->Next,i1++)
+    if (projecttag==tdt1)
+      break;
+  return PROJECT_COLOR.at(i1);
   }
 //------------------------------------------------------------------------------
 void MainWindow::drawAllTasks() {
@@ -620,6 +633,7 @@ void MainWindow::addTaskProject(ToDo *todo,ToDo *todoproject,QString description
     return;
   if (todoproject->project!=nullptr) {
     todo->project=todoproject->project;
+    todo->context=todoproject->context;
     return;
     }
   for (pr1=project; pr1!=nullptr; pr1=pr1->Next)
