@@ -384,6 +384,7 @@ void MainWindow::addToDo(ToDo *todo,bool firstentry) {
     button=new QPushButton();
     button->setFont(QFont("Ubuntu",9));
     button->setText("Mail");
+    button->setFixedWidth(100);
     hlayout->addWidget(button);
     connect(button,&QPushButton::clicked,[=] () {
         gotoMail(todo);
