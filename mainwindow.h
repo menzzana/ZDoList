@@ -59,7 +59,8 @@ class MainWindow : public QMainWindow {
     void checkEmptyToDoFile();
     void loadTasks();
     void saveTasks();
-    void addToDo(ToDo *todo);
+    void addToDo(ToDo *todo,bool firstentry);
+    QHBoxLayout *addLayout(QVBoxLayout *vlayout);
     void drawAllTasks();
     void gotoMail(ToDo *todo);
     void setProject(ToDo *todo);
@@ -68,9 +69,13 @@ class MainWindow : public QMainWindow {
     void setPriority(ToDo *todo);
     void setDueDate(ToDo *todo);
     void deleteTask(ToDo *todo);
+    void addNewTask(ToDo *todo);
+    void addTaskProject(ToDo *todo,ToDo *todoproject,QString description,QString url);
     void setCompleted(QCheckBox *checkbox,ToDo *todo);
+    void toggleCollapsed(ToDo *todo);
     QString setTextColor(QString text,QString htmlfontcolor);
     string getFileName(QString filename);
+
 
   private slots:
     void on_actionExit_triggered();
@@ -86,7 +91,6 @@ class MainWindow : public QMainWindow {
     void on_actionSort_by_due_date_triggered();
     void on_actionFilter_nonprioritized_triggered();
     void on_actionSort_by_priority_days_left_triggered();
-    void on_actionGroup_Projects_triggered();
     void on_actionCollapsed_triggered();
     void on_actionExpanded_triggered();
 
@@ -94,7 +98,7 @@ class MainWindow : public QMainWindow {
     Ui::MainWindow *ui;
     ToDo *maintodo;
     int nmaintodo,mailsoftware,sortorder,default_sortorder,daysdeletecompleted;
-    bool nonprioritized,archiving,groupproject,collapsed,default_groupproject,default_collapsed;
+    bool nonprioritized,archiving,default_collapsed;
     ToDoTag *project,*context;
     QString todofilepath;
     QWidget *taskWidget;

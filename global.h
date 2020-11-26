@@ -54,6 +54,7 @@ template<typename T> T *addEntry(T *first,QString description) {
   tl1=new T();
   if (tl2!=nullptr)
     tl2->Next=tl1;
+  tl1->description=description;
   return tl1;
   }
 //------------------------------------------------------------------------------
@@ -66,10 +67,10 @@ template<typename T> T *getEntry(T *first,QString description) {
   return nullptr;
   }
 //------------------------------------------------------------------------------
-template<typename T> void shiftInsert(T *first,int dest,int src) {
+template<typename T> void shiftInsert(T *first,int src,int dest) {
   T tl;
 
-  if (abs(dest-src)<2)
+  if (dest==src)
     return;
   tl=first[src];
   for (int i1=src-1; i1>=dest; i1--)

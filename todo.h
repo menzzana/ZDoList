@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 class ToDo {
   public:
-    bool completed;
+    bool completed,collapsed;
     int priority;
     QString description;
     QUrl url;
@@ -42,7 +42,7 @@ class ToDo {
     void clear();
     void save(string filename,int length);
     QString getTaskValue(string fstr,int start,char end);
-    int load(string filename,string donefile,ToDoTag **context,ToDoTag **project,bool archiving,int daysdeletecompleted);
+    int load(string filename,string donefile,ToDoTag **context,ToDoTag **project,bool archiving,int daysdeletecompleted,bool collapsed);
     static int compareTasks(const void *a,const void *b);
     static int compareTasksPriority(const void *a,const void *b);
     static int compareTasksDueDate(const void *a,const void *b);
@@ -53,6 +53,7 @@ class ToDo {
     int checkContext(ToDo *todo,int *result);
     int checkProject(ToDo *todo,int *result);
     int checkDueDate(ToDo *todo,int *result);
+    QString getProjectName();
   };
 //------------------------------------------------------------------------------
 #endif // TODO_H

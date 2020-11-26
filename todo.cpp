@@ -23,7 +23,7 @@ ToDo::ToDo() {
   }
 //------------------------------------------------------------------------------
 void ToDo::clear() {
-  completed=false;
+  completed=collapsed=false;
   priority=0;
   description="";
   context=nullptr;
@@ -49,7 +49,7 @@ void ToDo::save(string filename,int length) {
       wout << firstspace << "(" << char(this[i1].priority+64) << ")";
       firstspace=" ";
       }
-    if (this[i1].completion.isValid()) {
+    if (this[i1].completed && this[i1].completion.isValid()) {
       wout << firstspace << this[i1].completion.toString("yyyy-MM-dd").toStdString();
       firstspace=" ";
       }
@@ -72,7 +72,7 @@ QString ToDo::getTaskValue(string fstr,int start,char end) {
   return QString::fromStdString(fstr.substr(start,fstr.find_first_of(end,start)-start));
   }
 //------------------------------------------------------------------------------
-int ToDo::load(string filename,string donefile,ToDoTag **context,ToDoTag **project,bool archiving,int daysdeletecompleted) {
+int ToDo::load(string filename,string donefile,ToDoTag **context,ToDoTag **project,bool archiving,int daysdeletecompleted,bool collapsed) {
   const int TODOTAGLENGTH=4;
   string TODOTAG[TODOTAGLENGTH]={
     " @'"," +'"," due:"," url:"
@@ -92,6 +92,7 @@ int ToDo::load(string filename,string donefile,ToDoTag **context,ToDoTag **proje
     if (fstr.length()==0)
       break;
     spacechar=0;
+    this[length].collapsed=collapsed;
     if (fstr.substr(spacechar,2)=="x ") {
       this[length].completed=true;
       spacechar=2;
@@ -108,7 +109,7 @@ int ToDo::load(string filename,string donefile,ToDoTag **context,ToDoTag **proje
       }
     s1=getTaskValue(fstr,spacechar,' ');
     date1=QDate::fromString(s1,"yyyy-MM-dd");
-    if (date1.isValid()) {
+    if (date1.isValid() && this[length].completed) {
       this[length].completion=this[length].creation;
       this[length].creation=date1;
       spacechar=spacechar+11;
@@ -266,16 +267,20 @@ int ToDo::checkContext(ToDo *todo,int *result) {
   }
 //------------------------------------------------------------------------------
 int ToDo::checkProject(ToDo *todo,int *result) {
-  if (this->project==nullptr || todo->project==nullptr)
-    return *result=(this->project==todo->project?0:
-                   this->project==nullptr?1:-1);
-  return *result=(this->project->description.compare(todo->project->description));
+  return *result=(this->getProjectName().compare(todo->getProjectName()));
   }
 //------------------------------------------------------------------------------
 int ToDo::checkDueDate(ToDo *todo,int *result) {
   if (!this->due.isValid() || !todo->due.isValid())
     return *result=(this->due.isValid()==todo->due.isValid()?
                    0:this->due.isValid()?-1:1);
-  return *result=(this->due<todo->due?-1:1);
+  return *result=(this->due==todo->due?0:this->due<todo->due?-1:1);
+  }
+//------------------------------------------------------------------------------
+QString ToDo::getProjectName() {
+  if (project==nullptr)
+    return "";
+  else
+    return project->description;
   }
 //------------------------------------------------------------------------------

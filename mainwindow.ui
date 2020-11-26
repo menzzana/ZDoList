@@ -65,7 +65,6 @@
     <addaction name="actionSort_by_due_date"/>
     <addaction name="actionSort_by_priority_days_left"/>
     <addaction name="actionFilter_nonprioritized"/>
-    <addaction name="actionGroup_Projects"/>
     <addaction name="separator"/>
     <addaction name="actionCollapsed"/>
     <addaction name="actionExpanded"/>
@@ -171,22 +170,19 @@
    </property>
   </action>
   <action name="actionCollapsed">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="text">
-    <string>Collapsed</string>
+    <string>Collapse</string>
    </property>
   </action>
   <action name="actionExpanded">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
-    <string>Expanded</string>
+    <string>Expand</string>
+   </property>
+   <property name="toolTip">
+    <string>Expand</string>
    </property>
   </action>
  </widget>

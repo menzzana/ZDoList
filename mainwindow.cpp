@@ -38,8 +38,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   todofilepath="";
   nonprioritized=false;
   archiving=true;
-  default_groupproject=groupproject=false;
-  default_collapsed=collapsed=false;
+  default_collapsed=false;
   loadTasks();
   }
 //------------------------------------------------------------------------------
@@ -69,7 +68,6 @@ void MainWindow::on_actionNew_context_triggered() {
     tdt1=addEntry(context,s1);
     if (context==nullptr)
       context=tdt1;
-    tdt1->description=s1;
     }
   }
 //------------------------------------------------------------------------------
@@ -83,40 +81,11 @@ void MainWindow::on_actionNew_project_triggered() {
     tdt1=addEntry(project,s1);
     if (project==nullptr)
       project=tdt1;
-    tdt1->description=s1;
     }
   }
 //------------------------------------------------------------------------------
 void MainWindow::on_actionNew_task_triggered() {
-  bool ok;
-  QString s1;
-  QStringList sl1,sl2;
-
-  s1=QInputDialog::getText(this,"New task","Description:",QLineEdit::Normal,s1,&ok);
-  if (ok) {
-    switch (mailsoftware) {
-      case THUNDERBIRD:
-        if (s1.startsWith("<A HREF=")) {
-          sl1=s1.split(" / ");
-          for (int i1=0; i1<sl1.size(); i1++)  {
-            sl2=sl1.at(i1).split("\">");
-            maintodo[nmaintodo].clear();
-            maintodo[nmaintodo].description=sl2.at(1).mid(0,sl2.at(1).indexOf('<'));
-            maintodo[nmaintodo].url=sl2.at(0).mid(9,-1);
-            nmaintodo++;
-            }
-          drawAllTasks();
-          checkAndSaveTasks();
-          return;
-          }
-        break;
-      }
-    maintodo[nmaintodo].clear();
-    maintodo[nmaintodo].description=s1;
-    nmaintodo++;
-    drawAllTasks();
-    checkAndSaveTasks();
-    }
+  addNewTask(nullptr);
   }
 //------------------------------------------------------------------------------
 void MainWindow::on_actionPreferences_triggered() {
@@ -145,7 +114,8 @@ void MainWindow::on_actionAbout_triggered() {
   QMessageBox msgbox;
 
   msgbox.setWindowTitle("ZDoList");
-  msgbox.setText("ZDoList version "+QString(SOFTWARE_VERSION)+"-"+QString(GIT_VERSION));
+  msgbox.setTextFormat(Qt::RichText);
+  msgbox.setText("<a href='https://github.com/menzzana/ZDoList'>ZDoList version "+QString(SOFTWARE_VERSION)+"-"+QString(GIT_VERSION)+"</a>");
   msgbox.setInformativeText("ZDoList is developed by Henric Zazzi");
   msgbox.setStandardButtons(QMessageBox::Ok);
   msgbox.exec();
@@ -162,6 +132,12 @@ void MainWindow::ShowContextMenu(const QPoint &pos,ToDo *todo) {
   QAction *action;
 
   menu=new QMenu();
+  action=new QAction("Add subtask",this);
+  menu->addAction(action);
+  connect(action,&QAction::triggered, [=] {
+      addNewTask(todo);
+      }
+    );
   action=new QAction("Edit task",this);
   menu->addAction(action);
   connect(action,&QAction::triggered, [=] {
@@ -222,31 +198,20 @@ void MainWindow::on_actionSort_by_priority_days_left_triggered() {
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
-void MainWindow::on_actionGroup_Projects_triggered() {
-  groupproject=ui->actionGroup_Projects->isChecked();
-  if (!groupproject)
-    collapsed=false;
-  ui->actionCollapsed->setEnabled(groupproject);
-  ui->actionExpanded->setEnabled(groupproject);
-  ui->actionExpanded->setChecked(!collapsed);
-  ui->actionCollapsed->setChecked(collapsed);
-  drawAllTasks();
-  }
-//------------------------------------------------------------------------------
 void MainWindow::on_actionFilter_nonprioritized_triggered() {
   nonprioritized=ui->actionFilter_nonprioritized->isChecked();
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
 void MainWindow::on_actionCollapsed_triggered() {
-  collapsed=ui->actionCollapsed->isChecked();
-  ui->actionExpanded->setChecked(!collapsed);
+  for (int i1=0; i1<nmaintodo; i1++)
+    maintodo[i1].collapsed=true;
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
 void MainWindow::on_actionExpanded_triggered() {
-  collapsed=!ui->actionExpanded->isChecked();
-  ui->actionCollapsed->setChecked(collapsed);
+  for (int i1=0; i1<nmaintodo; i1++)
+    maintodo[i1].collapsed=false;
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
@@ -267,14 +232,12 @@ void MainWindow::preferences() {
   prefdialog.setSoftware(MAILSOFTWARE,mailsoftware);
   prefdialog.setArchiving(archiving);
   prefdialog.setDeleteDays(daysdeletecompleted);
-  prefdialog.setGroupProject(default_groupproject);
   prefdialog.setCollapsed(default_collapsed);
   prefdialog.setSortOrder(default_sortorder);
   if (prefdialog.exec()==QDialog::Accepted) {
     todofilepath=prefdialog.getFilePath();
     mailsoftware=prefdialog.getSoftware();
     archiving=prefdialog.getArchiving();
-    default_groupproject=prefdialog.getGroupProject();
     default_collapsed=prefdialog.getCollapsed();
     daysdeletecompleted=prefdialog.getDeleteDays();
     default_sortorder=prefdialog.getSortOrder();
@@ -283,7 +246,6 @@ void MainWindow::preferences() {
     settings.setValue("MailSoftware",mailsoftware);
     settings.setValue("Archiving",archiving);
     settings.setValue("DeleteDays",daysdeletecompleted);
-    settings.setValue("GroupProject",default_groupproject);
     settings.setValue("Collapsed",default_collapsed);
     settings.setValue("DefaultSortOrder",default_sortorder);
     }
@@ -312,7 +274,6 @@ void MainWindow::loadTasks() {
   todofilepath=settings.value("ToDoPath",todofilepath).toString();
   mailsoftware=settings.value("MailSoftware",mailsoftware).toInt();
   archiving=settings.value("Archiving",archiving).toBool();
-  default_groupproject=settings.value("GroupProject",default_groupproject).toBool();
   default_collapsed=settings.value("Collapsed",default_collapsed).toBool();
   daysdeletecompleted=settings.value("DeleteDays",daysdeletecompleted).toInt();
   default_sortorder=settings.value("DefaultSortOrder",default_sortorder).toInt();
@@ -320,9 +281,7 @@ void MainWindow::loadTasks() {
     preferences();
   checkEmptyToDoFile();
   sortorder=default_sortorder;
-  groupproject=default_groupproject;
-  collapsed=default_collapsed;
-  nmaintodo=maintodo->load(getFileName(TODO_FILENAME),getFileName(DONE_FILENAME),&context,&project,archiving,daysdeletecompleted);
+  nmaintodo=maintodo->load(getFileName(TODO_FILENAME),getFileName(DONE_FILENAME),&context,&project,archiving,daysdeletecompleted,default_collapsed);
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
@@ -330,27 +289,42 @@ void MainWindow::saveTasks() {
   maintodo->save(getFileName(TODO_FILENAME),nmaintodo);
   }
 //------------------------------------------------------------------------------
-void MainWindow::addToDo(ToDo *todo) {
+void MainWindow::addToDo(ToDo *todo,bool firstentry) {
   QFrame *frame;
-  QGridLayout *myLayout;
-  QHBoxLayout *bottomLayout;
+  QVBoxLayout *vlayout;
+  QHBoxLayout *hlayout;
   QLabel *label;
   QCheckBox *checkbox;
   QPushButton *button;
   QString duecolor,projecttext,framestyle;
-  int row,i1,nfound;
 
+  if (todo->collapsed && !firstentry)
+    return;
+  if (nonprioritized && todo->priority>0)
+    return;
   frame=new QFrame();
   frame->setFrameShape(QFrame::Box);
-  myLayout=new QGridLayout();
-  frame->setLayout(myLayout);
+  vlayout=new QVBoxLayout();
+  frame->setLayout(vlayout);
   taskLayout->addWidget(frame);
   frame->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(frame,&QFrame::customContextMenuRequested,[=](const QPoint &pos) {
       ShowContextMenu(pos,todo);
       }
     );
-  row=0;
+  hlayout=addLayout(vlayout);
+  if (firstentry && todo->project!=nullptr) {
+    button=new QPushButton();
+    button->setFixedWidth(15);
+    button->setFixedHeight(15);
+    button->setFont(QFont("Ubuntu",9));
+    button->setText(todo->collapsed?"+":"-");
+    connect(button,&QPushButton::clicked,[=] () {
+        toggleCollapsed(todo);
+        }
+      );
+    hlayout->addWidget(button);
+    }
   checkbox=new QCheckBox();
   checkbox->setFont(QFont("Ubuntu",9));
   framestyle="color: black;";
@@ -360,56 +334,37 @@ void MainWindow::addToDo(ToDo *todo) {
     }
   else
     framestyle=framestyle+"background-color: "+PRIORITY_COLOR.at(todo->priority);
+  frame->setStyleSheet(".QFrame {"+framestyle+"}");
   checkbox->setText(todo->description);
   checkbox->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
   connect(checkbox,&QCheckBox::stateChanged,[=] () {
       setCompleted(checkbox,todo);
       }
     );
-  myLayout->addWidget(checkbox,row,0,1,3);
-  row++;
+  hlayout->addWidget(checkbox);
+  hlayout=addLayout(vlayout);
   if (todo->context!=nullptr) {
     label=new QLabel();
     label->setFont(QFont("Ubuntu",9));
     label->setText(setTextColor("@"+todo->context->description,"darkmagenta"));
     label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
-    myLayout->addWidget(label,row,0,1,1);
+    hlayout->addWidget(label);
     }
   if (todo->project!=nullptr) {
     label=new QLabel();
     label->setFont(QFont("Ubuntu",9));
     projecttext=setTextColor("+"+todo->project->description,"darkblue");
-    if (collapsed) {
-      for (i1=0; &maintodo[i1]!=todo; i1++);
-      for (nfound=0; i1<nmaintodo; i1++) {
-        if (maintodo[i1].project==nullptr)
-          break;
-        if (maintodo[i1].project->description.compare(todo->project->description)!=0)
-          break;
-        nfound++;
-        }
-      projecttext=projecttext+" <b>("+QString::number(nfound)+")</b>";
-      framestyle="border-style: outset;border-color:darkblue; border-left-width: 4px;"+framestyle;
-      }
     label->setText(projecttext);
     label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
-    myLayout->addWidget(label,row,1,1,2);
+    hlayout->addWidget(label);
     }
-  if (todo->context!=nullptr || todo->project!=nullptr)
-    row++;
-  frame->setStyleSheet(".QFrame {"+framestyle+"}");
-  frame=new QFrame();
-  frame->setStyleSheet(".QFrame {border-style: default;color: black;}");
-  frame->setFrameShape(QFrame::NoFrame);
-  bottomLayout=new QHBoxLayout();
-  bottomLayout->setContentsMargins(0,0,0,0);
-  frame->setLayout(bottomLayout);
+  hlayout=addLayout(vlayout);
   if (todo->priority>0) {
     label=new QLabel();
     label->setFont(QFont("Ubuntu",9));
     label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
     label->setText(setTextColor("<b>"+QString(char(todo->priority+64))+"</b>","black"));
-    bottomLayout->addWidget(label);
+    hlayout->addWidget(label);
     }
   if (todo->due.isValid()) {
     label=new QLabel();
@@ -420,22 +375,32 @@ void MainWindow::addToDo(ToDo *todo) {
       duecolor="black";
     label->setText(setTextColor(todo->due.toString("yyyy-MM-dd"),duecolor));
     label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
-    bottomLayout->addWidget(label);
+    hlayout->addWidget(label);
     }
   if (!todo->url.isEmpty()) {
     button=new QPushButton();
     button->setFont(QFont("Ubuntu",9));
     button->setText("Mail");
-    bottomLayout->addWidget(button);
+    hlayout->addWidget(button);
     connect(button,&QPushButton::clicked,[=] () {
         gotoMail(todo);
         }
       );
     }
-  if (bottomLayout->count()>0)
-    myLayout->addWidget(frame,row,0,1,1);
-  else
-    delete frame;
+  }
+//------------------------------------------------------------------------------
+QHBoxLayout *MainWindow::addLayout(QVBoxLayout *vlayout) {
+  QFrame *frame;
+  QHBoxLayout *hlayout;
+
+  frame=new QFrame();
+  frame->setStyleSheet(".QFrame {border-style: default;color: black;}");
+  frame->setFrameShape(QFrame::NoFrame);
+  hlayout=new QHBoxLayout();
+  hlayout->setContentsMargins(0,0,0,0);
+  frame->setLayout(hlayout);
+  vlayout->addWidget(frame);
+  return hlayout;
   }
 //------------------------------------------------------------------------------
 void MainWindow::drawAllTasks() {
@@ -468,29 +433,20 @@ void MainWindow::drawAllTasks() {
       qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasksPriorityDaysLeft);
       break;
     }
-  ui->actionGroup_Projects->setChecked(groupproject);
-  if (groupproject)
-    for (int i1=0; i1<nmaintodo; i1++)
-      if (maintodo[i1].project!=nullptr)
-        for (int i2=i1+1; i2<nmaintodo; i2++) {
-          if (maintodo[i2].project==nullptr)
-            continue;
-          if (maintodo[i1].project->description.compare(maintodo[i2].project->description)!=0)
-            continue;
-          shiftInsert(maintodo,i1+1,i2);
+  for (int i1=0; i1<nmaintodo; i1++)
+    if (maintodo[i1].project!=nullptr)
+      for (int i2=i1+1; i2<nmaintodo; i2++)
+        if (maintodo[i1].getProjectName().compare(maintodo[i2].getProjectName())==0) {
+          shiftInsert(maintodo,i2,i1+1);
           break;
           }
   projectname="";
   for (int i1=0; i1<nmaintodo; i1++) {
-    if (maintodo[i1].project!=nullptr) {
-      if (maintodo[i1].project->description.compare(projectname)==0 && collapsed)
-        continue;
-      projectname=maintodo[i1].project->description;
-      }
-    else
-      projectname="";
-    if (!nonprioritized || (maintodo[i1].priority==0 && !maintodo[i1].completed))
-      addToDo(&maintodo[i1]);
+    bool b1=maintodo[i1].getProjectName().compare(projectname)!=0;
+    if (maintodo[i1].getProjectName().isEmpty())
+      b1=true;
+    addToDo(&maintodo[i1],b1);
+    projectname=maintodo[i1].getProjectName();
     }
   }
 //------------------------------------------------------------------------------
@@ -600,6 +556,13 @@ void MainWindow::setCompleted(QCheckBox *checkbox,ToDo *todo) {
   checkAndSaveTasks();
   }
 //------------------------------------------------------------------------------
+void MainWindow::toggleCollapsed(ToDo *todo) {
+  for (int i1=0; i1<nmaintodo; i1++)
+    if (maintodo[i1].getProjectName().compare(todo->getProjectName())==0)
+      maintodo[i1].collapsed=!maintodo[i1].collapsed;
+  drawAllTasks();
+  }
+//------------------------------------------------------------------------------
 void MainWindow::deleteTask(ToDo *todo) {
   bool found;
 
@@ -616,4 +579,64 @@ void MainWindow::deleteTask(ToDo *todo) {
   checkAndSaveTasks();
   }
 //------------------------------------------------------------------------------
+void MainWindow::addNewTask(ToDo *todo) {
+  bool ok;
+  QString s1;
+  QStringList sl1,sl2;
+  int currententries;
 
+  s1=QInputDialog::getText(this,"New task","Description:",QLineEdit::Normal,s1,&ok);
+  if (ok && !s1.isEmpty()) {
+    currententries=nmaintodo;
+    switch (mailsoftware) {
+      case THUNDERBIRD:
+        if (s1.startsWith("<A HREF=")) {
+          sl1=s1.split(" / ");
+          for (int i1=0; i1<sl1.size(); i1++)  {
+            sl2=sl1.at(i1).split("\">");
+            addTaskProject(&maintodo[nmaintodo],todo,sl2.at(1).mid(0,sl2.at(1).indexOf('<')),sl2.at(0).mid(9,-1));
+            nmaintodo++;
+            }
+          }
+        break;
+      }
+    if (currententries==nmaintodo) {
+      addTaskProject(&maintodo[nmaintodo],todo,s1,nullptr);
+      nmaintodo++;
+      }
+    drawAllTasks();
+    checkAndSaveTasks();
+    }
+  }
+//------------------------------------------------------------------------------
+void MainWindow::addTaskProject(ToDo *todo,ToDo *todoproject,QString description,QString url) {
+  ToDoTag *pr1;
+  QMessageBox msgbox;
+
+  todo->clear();
+  todo->description=description;
+  todo->url=url;
+  if (todoproject==nullptr)
+    return;
+  if (todoproject->project!=nullptr) {
+    todo->project=todoproject->project;
+    return;
+    }
+  for (pr1=project; pr1!=nullptr; pr1=pr1->Next)
+    if (pr1->description.compare(todoproject->description)==0) {
+      msgbox.setWindowTitle("Error");
+      msgbox.setText("Project does already exists");
+      msgbox.setInformativeText("Creating as normal task. Manually assign project");
+      msgbox.setStandardButtons(QMessageBox::Ok);
+      msgbox.exec();
+      msgbox.close();
+      return;
+      }
+  pr1=addEntry(project,todoproject->description);
+  if (project==nullptr)
+    project=pr1;
+  todoproject->project=pr1;
+  todo->project=pr1;
+  todo->context=todoproject->context;
+  }
+//------------------------------------------------------------------------------
