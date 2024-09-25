@@ -76,7 +76,8 @@ class MainWindow : public QMainWindow {
     void toggleCollapsed(ToDo *todo);
     QString setTextColor(QString text,QString htmlfontcolor);
     string getFileName(QString filename);
-
+    void copyMailFile(QString filename);
+    void deleteMailFile(QString filename);
 
   private slots:
     void on_actionExit_triggered();

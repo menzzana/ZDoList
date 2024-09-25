@@ -33,11 +33,12 @@ const int MAXMAILBUTTONWIDTH=100;
 const int MAXPRIORITY=5;
 const int DAYSPERPRIO=7;
 const unsigned int MAXTASKS=1000;
+const QString ZDOLIST_FOLDER="/.zdolist";
 const QString TODO_FILENAME="/todo.txt";
 const QString DONE_FILENAME="/done.txt";
 const QString INI_FILENAME="/ZDoList.ini";
 const QStringList PRIORITY_COLOR={
-  "white","#ffafaf","#f0bfbf","#f0cfcf","#f0dfdf","#ffefef"
+  "white","#ffafaf","#ffc0a0","#ffd180","#ffe299","#ffffb3"
   };
 const QStringList PROJECT_COLOR={
   "Maroon","Olive","Teal","Navy","Purple","Silver","Aqua","Gray","Blue","DarkMagenta"

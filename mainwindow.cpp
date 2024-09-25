@@ -35,7 +35,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   maintodo=new ToDo[MAXTASKS];
   nmaintodo=mailsoftware=daysdeletecompleted=0;
   default_sortorder=sortorder=SORTORDER::DEFAULT;
-  todofilepath="";
+  todofilepath=QDir::homePath()+ZDOLIST_FOLDER;
+  QDir dir(todofilepath);
+  if (!dir.exists())
+    dir.mkpath(todofilepath);
   nonprioritized=false;
   archiving=true;
   default_collapsed=false;
@@ -97,11 +100,11 @@ void MainWindow::dropEvent(QDropEvent *event) {
 
   foreach(QUrl item,event->mimeData()->urls()) {
     s1=item.url();
-    if (item.url().startsWith("imap"))
-      s1="Mail (Thunderbird)";
     maintodo[nmaintodo].clear();
-    maintodo[nmaintodo].description=s1;
-    maintodo[nmaintodo].url=item.url();
+    maintodo[nmaintodo].description=s1.section('/', -1).section('.', 0, -2);
+    s1=s1.remove(0,7);
+    copyMailFile(s1);
+    maintodo[nmaintodo].url=s1.section('/', -1);
     nmaintodo++;
     drawAllTasks();
     checkAndSaveTasks();
@@ -225,24 +228,29 @@ string MainWindow::getFileName(QString filename) {
   return (todofilepath+filename).toStdString();
   }
 //------------------------------------------------------------------------------
+void MainWindow::copyMailFile(QString filename) {
+  system(("cp \""+filename+"\" "+todofilepath).toStdString().c_str());
+  }
+//------------------------------------------------------------------------------
+void MainWindow::deleteMailFile(QString filename) {
+  system(("rm \""+todofilepath+"/"+filename+"\" ").toStdString().c_str());
+  }
+//------------------------------------------------------------------------------
 void MainWindow::preferences() {
   PreferencesDialog prefdialog;
 
-  prefdialog.setFilePath(todofilepath);
   prefdialog.setSoftware(MAILSOFTWARE,mailsoftware);
   prefdialog.setArchiving(archiving);
   prefdialog.setDeleteDays(daysdeletecompleted);
   prefdialog.setCollapsed(default_collapsed);
   prefdialog.setSortOrder(default_sortorder);
   if (prefdialog.exec()==QDialog::Accepted) {
-    todofilepath=prefdialog.getFilePath();
     mailsoftware=prefdialog.getSoftware();
     archiving=prefdialog.getArchiving();
     default_collapsed=prefdialog.getCollapsed();
     daysdeletecompleted=prefdialog.getDeleteDays();
     default_sortorder=prefdialog.getSortOrder();
-    QSettings settings(QDir::currentPath()+INI_FILENAME, QSettings::IniFormat);
-    settings.setValue("ToDoPath",todofilepath);
+    QSettings settings(todofilepath+INI_FILENAME, QSettings::IniFormat);
     settings.setValue("MailSoftware",mailsoftware);
     settings.setValue("Archiving",archiving);
     settings.setValue("DeleteDays",daysdeletecompleted);
@@ -257,28 +265,18 @@ void MainWindow::checkEmptyToDoFile() {
 
   ifstream fp(getFileName(TODO_FILENAME).c_str());
   if (!fp.good()) {
-    msgbox.setText("Create Todo.txt file");
-    msgbox.setInformativeText("File not found. Do you want to create a Task file?");
-    msgbox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
-    if (msgbox.exec()==QMessageBox::Ok) {
-      ofstream output(getFileName(TODO_FILENAME));
-      ofstream output2(getFileName(DONE_FILENAME));
-      }
-    else
-      close();
+    ofstream output(getFileName(TODO_FILENAME));
+    ofstream output2(getFileName(DONE_FILENAME));
     }
   }
 //------------------------------------------------------------------------------
 void MainWindow::loadTasks() {
-  QSettings settings(QDir::currentPath()+INI_FILENAME, QSettings::IniFormat);
-  todofilepath=settings.value("ToDoPath",todofilepath).toString();
+  QSettings settings(todofilepath+INI_FILENAME, QSettings::IniFormat);
   mailsoftware=settings.value("MailSoftware",mailsoftware).toInt();
   archiving=settings.value("Archiving",archiving).toBool();
   default_collapsed=settings.value("Collapsed",default_collapsed).toBool();
   daysdeletecompleted=settings.value("DeleteDays",daysdeletecompleted).toInt();
   default_sortorder=settings.value("DefaultSortOrder",default_sortorder).toInt();
-  if (todofilepath.isEmpty())
-    preferences();
   checkEmptyToDoFile();
   sortorder=default_sortorder;
   nmaintodo=maintodo->load(getFileName(TODO_FILENAME),getFileName(DONE_FILENAME),&context,&project,archiving,daysdeletecompleted,default_collapsed);
@@ -315,6 +313,7 @@ void MainWindow::addToDo(ToDo *todo,bool firstentry) {
     );
   hlayout=addLayout(vlayout);
   if (todo->project!=nullptr) {
+    // framestyle="border-style: double; For double lines
     framestyle="border-style: outset;border-color:"+getProjectColor(todo->project)+"; border-left-width: 4px;"+framestyle;
     if (firstentry && todo->project!=nullptr) {
       button=new QPushButton();
@@ -329,6 +328,22 @@ void MainWindow::addToDo(ToDo *todo,bool firstentry) {
       hlayout->addWidget(button);
       }
     }
+  if (todo->project!=nullptr) {
+    label=new QLabel();
+    label->setFont(QFont("Ubuntu",9));
+    projecttext=setTextColor(todo->project->description,"darkblue");
+    label->setText(projecttext);
+    label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
+    hlayout->addWidget(label);
+    }
+  if (todo->context!=nullptr) {
+    label=new QLabel();
+    label->setFont(QFont("Ubuntu",9));
+    label->setText(setTextColor("@"+todo->context->description,"darkmagenta"));
+    label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
+    hlayout->addWidget(label);
+    }
+  hlayout=addLayout(vlayout);
   checkbox=new QCheckBox();
   checkbox->setFont(QFont("Ubuntu",9));
   if (todo->completed) {
@@ -345,22 +360,6 @@ void MainWindow::addToDo(ToDo *todo,bool firstentry) {
       }
     );
   hlayout->addWidget(checkbox);
-  hlayout=addLayout(vlayout);
-  if (todo->context!=nullptr) {
-    label=new QLabel();
-    label->setFont(QFont("Ubuntu",9));
-    label->setText(setTextColor("@"+todo->context->description,"darkmagenta"));
-    label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
-    hlayout->addWidget(label);
-    }
-  if (todo->project!=nullptr) {
-    label=new QLabel();
-    label->setFont(QFont("Ubuntu",9));
-    projecttext=setTextColor("+"+todo->project->description,"darkblue");
-    label->setText(projecttext);
-    label->setMaximumWidth(frame->width()-MAXLABELWIDTHDIFF);
-    hlayout->addWidget(label);
-    }
   hlayout=addLayout(vlayout);
   if (todo->priority>0) {
     label=new QLabel();
@@ -469,12 +468,10 @@ void MainWindow::gotoMail(ToDo *todo) {
 
   switch(mailsoftware) {
     case 0:
-      urltype="thunderbird -mail";
-      if (todo->url.toString().startsWith("thunderlink:"))
-        urltype="thunderbird -thunderlink";
+      urltype="thunderbird ";
       break;
     }
-  system((urltype+" "+todo->url.toString().toStdString()).c_str());
+  system((urltype+" \""+getFileName("/"+todo->url+"\"")).c_str());
   }
 //------------------------------------------------------------------------------
 void MainWindow::setProject(ToDo *todo) {
@@ -582,8 +579,11 @@ void MainWindow::deleteTask(ToDo *todo) {
 
   found=false;
   for (int i1=0; i1<nmaintodo; i1++) {
-    if (todo==&maintodo[i1])
+    if (todo==&maintodo[i1]) {
       found=true;
+      if (!todo->url.isEmpty())
+        deleteMailFile(todo->url);
+      }
     if (found)
       maintodo[i1]=maintodo[i1+1];
     }

@@ -33,21 +33,6 @@ PreferencesDialog::~PreferencesDialog() {
   delete ui;
   }
 //------------------------------------------------------------------------------
-void PreferencesDialog::on_pushButton_clicked() {
-  QString s1;
-  QFileDialog filedialog;
-
-  s1=filedialog.getExistingDirectory(this,tr("Choose a directory"),"/home",
-                                               QFileDialog::ShowDirsOnly | QFileDialog::ReadOnly);
-  if (s1.isEmpty())
-    return;
-  ui->lineEdit->setText(s1);
-  }
-//------------------------------------------------------------------------------
-void PreferencesDialog::setFilePath(QString filepath) {
-  ui->lineEdit->setText(filepath);
-  }
-//------------------------------------------------------------------------------
 void PreferencesDialog::setSoftware(QStringList softwarelist,int softwareindex) {
   ui->comboBox->addItems(softwarelist);
   ui->comboBox->setCurrentIndex(softwareindex);
@@ -58,7 +43,6 @@ void PreferencesDialog::setArchiving(bool archiving) {
   }
 //------------------------------------------------------------------------------
 void PreferencesDialog::setDeleteDays(int days) {
-  ui->checkBox->setChecked(days>0);
   ui->groupBox->setEnabled(days>0);
   ui->lineEdit_2->setText(QString::number(days));
   }
@@ -69,10 +53,6 @@ void PreferencesDialog::setCollapsed(bool collapsed) {
 //------------------------------------------------------------------------------
 void PreferencesDialog::setSortOrder(int sorttype) {
   ui->comboBox_3->setCurrentIndex(sorttype);
-  }
-//------------------------------------------------------------------------------
-QString PreferencesDialog::getFilePath() {
-  return ui->lineEdit->text();
   }
 //------------------------------------------------------------------------------
 int PreferencesDialog::getSoftware() {

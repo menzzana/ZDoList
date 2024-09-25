@@ -45,8 +45,7 @@ class PreferencesDialog : public QDialog {
     int getSortOrder();
     bool getCollapsed();
 
-  private slots:
-    void on_pushButton_clicked();
+    private slots:
     void on_checkBox_stateChanged(int arg1);
 
     private:

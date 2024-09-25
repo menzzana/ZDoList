@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************************/
 #include "datedialog.h"
 #include "ui_datedialog.h"
-#include "global.h"
 //------------------------------------------------------------------------------
 DateDialog::DateDialog(QWidget *parent) : QDialog(parent), ui(new Ui::DateDialog) {
   ui->setupUi(this);

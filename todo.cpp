@@ -62,7 +62,7 @@ void ToDo::save(string filename,int length) {
     if (this[i1].due.isValid())
       wout << " due:" << this[i1].due.toString("yyyy-MM-dd").toStdString();
     if (!this[i1].url.isEmpty())
-      wout << " url:\'" << this[i1].url.toString().toStdString() << "\'";
+      wout << " url:\'" << this[i1].url.toStdString() << "\'";
     wout << endl;
     }
   wout.close();

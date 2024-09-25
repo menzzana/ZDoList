@@ -32,8 +32,7 @@ class ToDo {
   public:
     bool completed,collapsed;
     int priority;
-    QString description;
-    QUrl url;
+    QString description,url;
     ToDoTag *context;
     ToDoTag *project;
     QDate due,completion,creation;
