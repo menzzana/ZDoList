@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QComboBox>
 #include "datedialog.h"
 #include "preferencesdialog.h"
+#include "paramdialog.h"
 #include <qfiledialog.h>
 #include <QSettings>
 #include <QDrag>
@@ -81,8 +82,6 @@ class MainWindow : public QMainWindow {
 
   private slots:
     void on_actionExit_triggered();
-    void on_actionNew_context_triggered();
-    void on_actionNew_project_triggered();
     void on_actionNew_task_triggered();
     void on_actionPreferences_triggered();
     void on_actionAbout_triggered();
@@ -99,8 +98,8 @@ class MainWindow : public QMainWindow {
     private:
     Ui::MainWindow *ui;
     ToDo *maintodo;
-    int nmaintodo,mailsoftware,sortorder,default_sortorder,daysdeletecompleted;
-    bool nonprioritized,archiving,default_collapsed;
+    int nmaintodo,mailsoftware,sortorder,default_sortorder,completedtasks,daysdeletecompleted;
+    bool hidecompleted,nonprioritized,default_collapsed;
     ToDoTag *project,*context;
     QString todofilepath;
     QWidget *taskWidget;

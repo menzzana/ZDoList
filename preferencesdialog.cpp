@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent),ui(new Ui::PreferencesDialog) {
   ui->setupUi(this);
+  ui->comboBox_2->addItem("No action");
   ui->comboBox_2->addItem("Delete");
   ui->comboBox_2->addItem("Archive");
   ui->comboBox_3->addItem("Context");
@@ -33,17 +34,20 @@ PreferencesDialog::~PreferencesDialog() {
   delete ui;
   }
 //------------------------------------------------------------------------------
+void PreferencesDialog::setHideCompleted(bool hidecompleted) {
+  ui->checkBox->setChecked(hidecompleted);
+  }
+//------------------------------------------------------------------------------
 void PreferencesDialog::setSoftware(QStringList softwarelist,int softwareindex) {
   ui->comboBox->addItems(softwarelist);
   ui->comboBox->setCurrentIndex(softwareindex);
   }
 //------------------------------------------------------------------------------
-void PreferencesDialog::setArchiving(bool archiving) {
-  ui->comboBox_2->setCurrentIndex(archiving?1:0);
+void PreferencesDialog::setCompletedTasks(int completedtasks) {
+  ui->comboBox_2->setCurrentIndex(completedtasks);
   }
 //------------------------------------------------------------------------------
 void PreferencesDialog::setDeleteDays(int days) {
-  ui->groupBox->setEnabled(days>0);
   ui->lineEdit_2->setText(QString::number(days));
   }
 //------------------------------------------------------------------------------
@@ -55,16 +59,20 @@ void PreferencesDialog::setSortOrder(int sorttype) {
   ui->comboBox_3->setCurrentIndex(sorttype);
   }
 //------------------------------------------------------------------------------
+bool PreferencesDialog::getHideCompleted() {
+  return ui->checkBox->checkState();
+  }
+//------------------------------------------------------------------------------
 int PreferencesDialog::getSoftware() {
   return ui->comboBox->currentIndex();
   }
 //------------------------------------------------------------------------------
-bool PreferencesDialog::getArchiving() {
-  return ui->comboBox_2->currentIndex()>0;
+int PreferencesDialog::getCompletedTasks() {
+  return ui->comboBox_2->currentIndex();
   }
 //------------------------------------------------------------------------------
 int PreferencesDialog::getDeleteDays() {
-  return ui->checkBox->checkState()?ui->lineEdit_2->text().toInt():0;
+  return ui->lineEdit_2->text().toInt();
   }
 //------------------------------------------------------------------------------
 int PreferencesDialog::getSortOrder() {

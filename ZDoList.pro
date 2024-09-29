@@ -30,6 +30,7 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
+    paramdialog.cpp \
     todo.cpp \
     todotag.cpp \
     datedialog.cpp \
@@ -37,6 +38,7 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
+    paramdialog.h \
     todo.h \
     todotag.h \
     global.h \
@@ -46,6 +48,7 @@ HEADERS += \
 FORMS += \
         mainwindow.ui \
     datedialog.ui \
+    paramdialog.ui \
     preferencesdialog.ui
 
 

@@ -72,7 +72,7 @@ QString ToDo::getTaskValue(string fstr,int start,char end) {
   return QString::fromStdString(fstr.substr(start,fstr.find_first_of(end,start)-start));
   }
 //------------------------------------------------------------------------------
-int ToDo::load(string filename,string donefile,ToDoTag **context,ToDoTag **project,bool archiving,int daysdeletecompleted,bool collapsed) {
+int ToDo::load(string filename,string donefile,ToDoTag **context,ToDoTag **project,int completedtasks,int daysdeletecompleted,bool collapsed) {
   const int TODOTAGLENGTH=4;
   string TODOTAG[TODOTAGLENGTH]={
     " @'"," +'"," due:"," url:"
@@ -114,7 +114,7 @@ int ToDo::load(string filename,string donefile,ToDoTag **context,ToDoTag **proje
       this[length].creation=date1;
       spacechar=spacechar+11;
       if (this[length].completion.addDays(daysdeletecompleted)<QDate::currentDate() && daysdeletecompleted>0) {
-        if (archiving)
+        if (completedtasks==ARCHIVETASK)
           wout << fstr << endl;
         continue;
         }

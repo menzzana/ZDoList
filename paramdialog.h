@@ -16,42 +16,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 *******************************************************************************/
-#ifndef PREFERENCESDIALOG_H
-#define PREFERENCESDIALOG_H
+#ifndef PARAMDIALOG_H
+#define PARAMDIALOG_H
 //------------------------------------------------------------------------------
 #include <QDialog>
-#include <qfiledialog.h>
+#include "todotag.h"
+#include "todo.h"
 //------------------------------------------------------------------------------
 namespace Ui {
-  class PreferencesDialog;
+  class ParamDialog;
   }
 //------------------------------------------------------------------------------
-class PreferencesDialog : public QDialog {
+class ParamDialog : public QDialog {
   Q_OBJECT
 
   public:
-    explicit PreferencesDialog(QWidget *parent = nullptr);
-    ~PreferencesDialog();
-    void setFilePath(QString filepath);
-    void setHideCompleted(bool hidecompleted);
-    void setSoftware(QStringList softwarelist,int softwareindex);
-    void setCompletedTasks(int completedtasks);
-    void setDeleteDays(int days);
-    void setCollapsed(bool collapsed);
-    void setSortOrder(int sorttype);
-    QString getFilePath();
-    bool getHideCompleted();
-    int getSoftware();
-    int getCompletedTasks();
-    int getDeleteDays();
-    int getSortOrder();
-    bool getCollapsed();
+  explicit ParamDialog(QWidget *parent = nullptr);
+    ~ParamDialog();
+    void setText(QString text);
+    void setTags(ToDoTag *paramtag,ToDo *todo);
+    QString getToDoText();
 
-    private slots:
-    void on_checkBox_stateChanged(int arg1);
-
-    private:
-    Ui::PreferencesDialog *ui;
+  private:
+  Ui::ParamDialog *ui;
+  bool comboEditStart;
   };
 //------------------------------------------------------------------------------
-#endif // PREFERENCESDIALOG_H
+#endif // PARAMDIALOG_H

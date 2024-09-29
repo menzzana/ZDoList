@@ -48,6 +48,7 @@ const QStringList MAILSOFTWARE={
   };
 enum MAILORDER {THUNDERBIRD};
 enum SORTORDER {DEFAULT,PRIORITY,DUEDATE,PRIORITYDAYSLEFT};
+enum COMPLETEDTASKS {NO_ACTIONTASK,DELETETASK,ARCHIVETASK};
 //------------------------------------------------------------------------------
 template<typename T> T *addEntry(T *first,QString description) {
   T *tl1,*tl2;

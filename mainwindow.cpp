@@ -40,8 +40,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   if (!dir.exists())
     dir.mkpath(todofilepath);
   nonprioritized=false;
-  archiving=true;
+  completedtasks=0;
   default_collapsed=false;
+  hidecompleted=false;
   loadTasks();
   }
 //------------------------------------------------------------------------------
@@ -59,32 +60,6 @@ void MainWindow::checkAndSaveTasks() {
   ifstream fp(getFileName(TODO_FILENAME).c_str());
   if (fp.good())
     saveTasks();
-  }
-//------------------------------------------------------------------------------
-void MainWindow::on_actionNew_context_triggered() {
-  bool ok;
-  QString s1;
-  ToDoTag *tdt1;
-
-  s1=QInputDialog::getText(this,"New context","Name:",QLineEdit::Normal,s1,&ok);
-  if (ok) {
-    tdt1=addEntry(context,s1);
-    if (context==nullptr)
-      context=tdt1;
-    }
-  }
-//------------------------------------------------------------------------------
-void MainWindow::on_actionNew_project_triggered() {
-  bool ok;
-  QString s1;
-  ToDoTag *tdt1;
-
-  s1=QInputDialog::getText(this,"New project","Name:",QLineEdit::Normal,s1,&ok);
-  if (ok) {
-    tdt1=addEntry(project,s1);
-    if (project==nullptr)
-      project=tdt1;
-    }
   }
 //------------------------------------------------------------------------------
 void MainWindow::on_actionNew_task_triggered() {
@@ -239,25 +214,29 @@ void MainWindow::deleteMailFile(QString filename) {
 void MainWindow::preferences() {
   PreferencesDialog prefdialog;
 
+  prefdialog.setHideCompleted(hidecompleted);
   prefdialog.setSoftware(MAILSOFTWARE,mailsoftware);
-  prefdialog.setArchiving(archiving);
+  prefdialog.setCompletedTasks(completedtasks);
   prefdialog.setDeleteDays(daysdeletecompleted);
   prefdialog.setCollapsed(default_collapsed);
   prefdialog.setSortOrder(default_sortorder);
   if (prefdialog.exec()==QDialog::Accepted) {
+    hidecompleted=prefdialog.getHideCompleted();
     mailsoftware=prefdialog.getSoftware();
-    archiving=prefdialog.getArchiving();
+    completedtasks=prefdialog.getCompletedTasks();
     default_collapsed=prefdialog.getCollapsed();
     daysdeletecompleted=prefdialog.getDeleteDays();
     default_sortorder=prefdialog.getSortOrder();
     QSettings settings(todofilepath+INI_FILENAME, QSettings::IniFormat);
+    settings.setValue("HideCompleted",hidecompleted);
     settings.setValue("MailSoftware",mailsoftware);
-    settings.setValue("Archiving",archiving);
+    settings.setValue("CompletedTasks",completedtasks);
     settings.setValue("DeleteDays",daysdeletecompleted);
     settings.setValue("Collapsed",default_collapsed);
     settings.setValue("DefaultSortOrder",default_sortorder);
     }
   prefdialog.close();
+  drawAllTasks();
   }
 //------------------------------------------------------------------------------
 void MainWindow::checkEmptyToDoFile() {
@@ -272,14 +251,15 @@ void MainWindow::checkEmptyToDoFile() {
 //------------------------------------------------------------------------------
 void MainWindow::loadTasks() {
   QSettings settings(todofilepath+INI_FILENAME, QSettings::IniFormat);
+  hidecompleted=settings.value("HideCompleted",hidecompleted).toBool();
   mailsoftware=settings.value("MailSoftware",mailsoftware).toInt();
-  archiving=settings.value("Archiving",archiving).toBool();
+  completedtasks=settings.value("CompletedTasks",completedtasks).toInt();
   default_collapsed=settings.value("Collapsed",default_collapsed).toBool();
   daysdeletecompleted=settings.value("DeleteDays",daysdeletecompleted).toInt();
   default_sortorder=settings.value("DefaultSortOrder",default_sortorder).toInt();
   checkEmptyToDoFile();
   sortorder=default_sortorder;
-  nmaintodo=maintodo->load(getFileName(TODO_FILENAME),getFileName(DONE_FILENAME),&context,&project,archiving,daysdeletecompleted,default_collapsed);
+  nmaintodo=maintodo->load(getFileName(TODO_FILENAME),getFileName(DONE_FILENAME),&context,&project,completedtasks,daysdeletecompleted,default_collapsed);
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
@@ -294,7 +274,7 @@ void MainWindow::addToDo(ToDo *todo,bool firstentry) {
   QLabel *label;
   QCheckBox *checkbox;
   QPushButton *button;
-  QString duecolor,projecttext,framestyle;
+  QString duecolor,projecttext,framestyle,duetext;
 
   if (todo->collapsed && !firstentry)
     return;
@@ -368,11 +348,14 @@ void MainWindow::addToDo(ToDo *todo,bool firstentry) {
     label->setText(setTextColor("<b>"+QString(char(todo->priority+64))+"</b>","black"));
     hlayout->addWidget(label);
     }
-  if (todo->due.isValid()) {
+  if (todo->due.isValid() && !todo->completed) {
     label=new QLabel();
     label->setFont(QFont("Ubuntu",9));
-    if (todo->due<QDate::currentDate())
+    duetext=todo->due.toString("yyyy-MM-dd");
+    if (todo->due<QDate::currentDate()) {
+      duetext="<b>"+duetext+"</b>";
       duecolor="red";
+      }
     else
       duecolor="black";
     label->setText(setTextColor(todo->due.toString("yyyy-MM-dd"),duecolor));
@@ -458,6 +441,8 @@ void MainWindow::drawAllTasks() {
     bool b1=maintodo[i1].getProjectName().compare(projectname)!=0;
     if (maintodo[i1].getProjectName().isEmpty())
       b1=true;
+    if (maintodo[i1].completed && hidecompleted)
+      continue;
     addToDo(&maintodo[i1],b1);
     projectname=maintodo[i1].getProjectName();
     }
@@ -475,47 +460,49 @@ void MainWindow::gotoMail(ToDo *todo) {
   }
 //------------------------------------------------------------------------------
 void MainWindow::setProject(ToDo *todo) {
-  bool ok;
-  QStringList stringlist;
-  QString s1;
+  ParamDialog paramdialog;
   ToDoTag *tdt1;
-  int idx,currentidx;
+  QString s1;
 
-  stringlist << QString("None");
-  currentidx=0;
-  for (tdt1=project,idx=1; tdt1!=nullptr; tdt1=tdt1->Next,idx++) {
-    stringlist << QString(tdt1->description);
-    if (tdt1==todo->project)
-      currentidx=idx;
-    }
-  s1=QInputDialog::getItem(this,"Set Project","Project",stringlist,currentidx,false,&ok);
-  if (ok) {
-    todo->project=getEntry(project,s1);
+  paramdialog.setWindowTitle("Set Context");
+  paramdialog.setText("Context");
+  paramdialog.setTags(project,todo);
+  if (paramdialog.exec()==QDialog::Accepted) {
+    s1=paramdialog.getToDoText();
+    tdt1=getEntry(project,s1);
+    if (tdt1==nullptr) {
+      tdt1=addEntry(project,s1);
+      if (project==nullptr)
+        project=tdt1;
+      }
+    todo->project=tdt1;
     drawAllTasks();
     checkAndSaveTasks();
     }
+  paramdialog.close();
   }
 //------------------------------------------------------------------------------
 void MainWindow::setContext(ToDo *todo) {
-  bool ok;
-  QStringList stringlist;
-  QString s1;
+  ParamDialog paramdialog;
   ToDoTag *tdt1;
-  int idx,currentidx;
+  QString s1;
 
-  stringlist << QString("None");
-  currentidx=0;
-  for (tdt1=context,idx=1; tdt1!=nullptr; tdt1=tdt1->Next,idx++) {
-    stringlist << QString(tdt1->description);
-    if (tdt1==todo->context)
-      currentidx=idx;
-    }
-  s1=QInputDialog::getItem(this,"Set Context","Context",stringlist,currentidx,false,&ok);
-  if (ok) {
-    todo->context=getEntry(context,s1);
+  paramdialog.setWindowTitle("Set Context");
+  paramdialog.setText("Context");
+  paramdialog.setTags(context,todo);
+  if (paramdialog.exec()==QDialog::Accepted) {
+    s1=paramdialog.getToDoText();
+    tdt1=getEntry(context,s1);
+    if (tdt1==nullptr) {
+      tdt1=addEntry(context,s1);
+      if (context==nullptr)
+        context=tdt1;
+      }
+    todo->context=tdt1;
     drawAllTasks();
     checkAndSaveTasks();
     }
+  paramdialog.close();
   }
 //------------------------------------------------------------------------------
 void MainWindow::editTask(ToDo *todo) {
