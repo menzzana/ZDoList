@@ -87,13 +87,13 @@ class MainWindow : public QMainWindow {
     void on_actionAbout_triggered();
     void checkAndSaveTasks();
     void ShowContextMenu(const QPoint &pos,ToDo *todo);
-    void on_actionSort_by_context_triggered();
-    void on_actionSort_by_priority_triggered();
-    void on_actionSort_by_due_date_triggered();
     void on_actionFilter_nonprioritized_triggered();
-    void on_actionSort_by_priority_days_left_triggered();
     void on_actionCollapsed_triggered();
     void on_actionExpanded_triggered();
+    void on_actionsortcontext_triggered();
+    void on_actionsortpriority_triggered();
+    void on_actionsortdue_date_triggered();
+    void on_actionsortpriority_days_left_triggered();
 
     private:
     Ui::MainWindow *ui;

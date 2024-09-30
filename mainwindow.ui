@@ -58,10 +58,16 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="actionSort_by_context"/>
-    <addaction name="actionSort_by_priority"/>
-    <addaction name="actionSort_by_due_date"/>
-    <addaction name="actionSort_by_priority_days_left"/>
+    <widget class="QMenu" name="menuSort_by">
+     <property name="title">
+      <string>Sort by ...</string>
+     </property>
+     <addaction name="actionsortcontext"/>
+     <addaction name="actionsortpriority"/>
+     <addaction name="actionsortdue_date"/>
+     <addaction name="actionsortpriority_days_left"/>
+    </widget>
+    <addaction name="menuSort_by"/>
     <addaction name="actionFilter_nonprioritized"/>
     <addaction name="separator"/>
     <addaction name="actionCollapsed"/>
@@ -116,47 +122,12 @@
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionSort_by_context">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>&amp;Sort by context</string>
-   </property>
-  </action>
-  <action name="actionSort_by_priority">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Sort &amp;by priority</string>
-   </property>
-  </action>
-  <action name="actionSort_by_due_date">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Sort by &amp;due date</string>
-   </property>
-  </action>
   <action name="actionFilter_nonprioritized">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
     <string>Filter nonprioritized</string>
-   </property>
-  </action>
-  <action name="actionSort_by_priority_days_left">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Sort by priority/days left</string>
    </property>
   </action>
   <action name="actionGroup_Projects">
@@ -181,6 +152,41 @@
    </property>
    <property name="toolTip">
     <string>Expand</string>
+   </property>
+  </action>
+  <action name="actionsortcontext">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>context</string>
+   </property>
+  </action>
+  <action name="actionsortpriority">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>priority</string>
+   </property>
+  </action>
+  <action name="actionsortdue_date">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>due date</string>
+   </property>
+  </action>
+  <action name="actionsortpriority_days_left">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>priority/days left</string>
    </property>
   </action>
  </widget>

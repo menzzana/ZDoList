@@ -156,23 +156,31 @@ void MainWindow::ShowContextMenu(const QPoint &pos,ToDo *todo) {
   menu->close();
   }
 //------------------------------------------------------------------------------
-void MainWindow::on_actionSort_by_context_triggered() {
+void MainWindow::on_actionsortcontext_triggered() {
   sortorder=SORTORDER::DEFAULT;
+  QSettings settings(todofilepath+INI_FILENAME, QSettings::IniFormat);
+  settings.setValue("DefaultSortOrder",sortorder);
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
-void MainWindow::on_actionSort_by_priority_triggered() {
+void MainWindow::on_actionsortpriority_triggered() {
   sortorder=SORTORDER::PRIORITY;
+  QSettings settings(todofilepath+INI_FILENAME, QSettings::IniFormat);
+  settings.setValue("DefaultSortOrder",sortorder);
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
-void MainWindow::on_actionSort_by_due_date_triggered() {
+void MainWindow::on_actionsortdue_date_triggered() {
   sortorder=SORTORDER::DUEDATE;
+  QSettings settings(todofilepath+INI_FILENAME, QSettings::IniFormat);
+  settings.setValue("DefaultSortOrder",sortorder);
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
-void MainWindow::on_actionSort_by_priority_days_left_triggered() {
+void MainWindow::on_actionsortpriority_days_left_triggered() {
   sortorder=SORTORDER::PRIORITYDAYSLEFT;
+  QSettings settings(todofilepath+INI_FILENAME, QSettings::IniFormat);
+  settings.setValue("DefaultSortOrder",sortorder);
   drawAllTasks();
   }
 //------------------------------------------------------------------------------
@@ -219,21 +227,18 @@ void MainWindow::preferences() {
   prefdialog.setCompletedTasks(completedtasks);
   prefdialog.setDeleteDays(daysdeletecompleted);
   prefdialog.setCollapsed(default_collapsed);
-  prefdialog.setSortOrder(default_sortorder);
   if (prefdialog.exec()==QDialog::Accepted) {
     hidecompleted=prefdialog.getHideCompleted();
     mailsoftware=prefdialog.getSoftware();
     completedtasks=prefdialog.getCompletedTasks();
     default_collapsed=prefdialog.getCollapsed();
     daysdeletecompleted=prefdialog.getDeleteDays();
-    default_sortorder=prefdialog.getSortOrder();
     QSettings settings(todofilepath+INI_FILENAME, QSettings::IniFormat);
     settings.setValue("HideCompleted",hidecompleted);
     settings.setValue("MailSoftware",mailsoftware);
     settings.setValue("CompletedTasks",completedtasks);
     settings.setValue("DeleteDays",daysdeletecompleted);
     settings.setValue("Collapsed",default_collapsed);
-    settings.setValue("DefaultSortOrder",default_sortorder);
     }
   prefdialog.close();
   drawAllTasks();
@@ -407,25 +412,25 @@ void MainWindow::drawAllTasks() {
     delete item->widget();
     delete item;
     }
-  ui->actionSort_by_context->setChecked(false);
-  ui->actionSort_by_priority->setChecked(false);
-  ui->actionSort_by_due_date->setChecked(false);
-  ui->actionSort_by_priority_days_left->setChecked(false);
+  ui->actionsortcontext->setChecked(false);
+  ui->actionsortpriority->setChecked(false);
+  ui->actionsortdue_date->setChecked(false);
+  ui->actionsortpriority_days_left->setChecked(false);
   switch (sortorder) {
     case SORTORDER::DEFAULT:
-      ui->actionSort_by_context->setChecked(true);
+      ui->actionsortcontext->setChecked(true);
       qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasks);
       break;
     case SORTORDER::PRIORITY:
-      ui->actionSort_by_priority->setChecked(true);
+      ui->actionsortpriority->setChecked(true);
       qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasksPriority);
       break;
     case SORTORDER::DUEDATE:
-      ui->actionSort_by_due_date->setChecked(true);
+      ui->actionsortdue_date->setChecked(true);
       qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasksDueDate);
       break;
     case SORTORDER::PRIORITYDAYSLEFT:
-      ui->actionSort_by_priority_days_left->setChecked(true);
+      ui->actionsortpriority_days_left->setChecked(true);
       qsort(maintodo,static_cast<size_t>(nmaintodo),sizeof(ToDo),ToDo::compareTasksPriorityDaysLeft);
       break;
     }
@@ -642,3 +647,5 @@ void MainWindow::addTaskProject(ToDo *todo,ToDo *todoproject,QString description
   todo->context=todoproject->context;
   }
 //------------------------------------------------------------------------------
+
+

@@ -38,17 +38,12 @@ class PreferencesDialog : public QDialog {
     void setCompletedTasks(int completedtasks);
     void setDeleteDays(int days);
     void setCollapsed(bool collapsed);
-    void setSortOrder(int sorttype);
     QString getFilePath();
     bool getHideCompleted();
     int getSoftware();
     int getCompletedTasks();
     int getDeleteDays();
-    int getSortOrder();
     bool getCollapsed();
-
-    private slots:
-    void on_checkBox_stateChanged(int arg1);
 
     private:
     Ui::PreferencesDialog *ui;
