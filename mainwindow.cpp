@@ -21,6 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
+
+  QScreen *screen = QGuiApplication::primaryScreen();
+  QRect screenGeometry = screen->geometry();
+  this->resize(this->width(), screenGeometry.height()-HEIGHTOFFSET);
   setAcceptDrops(true);
   ui->centralWidget->setBackgroundRole(QPalette::Dark);
   ui->scrollArea->takeWidget();
@@ -378,6 +382,12 @@ void MainWindow::addToDo(ToDo *todo,bool firstentry) {
         }
       );
     }
+
+  QString text = todo->description;
+  QFont font = checkbox->font();
+  QFontMetrics fm(font);
+  if ((fm.horizontalAdvance(text)+WIDTHOFFSET)<this->width())
+    this->resize(fm.horizontalAdvance(text)+WIDTHOFFSET, this->height());
   }
 //------------------------------------------------------------------------------
 QHBoxLayout *MainWindow::addLayout(QVBoxLayout *vlayout) {
