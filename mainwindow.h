@@ -101,7 +101,7 @@ class MainWindow : public QMainWindow {
     int nmaintodo,mailsoftware,sortorder,default_sortorder,completedtasks,daysdeletecompleted;
     bool hidecompleted,nonprioritized,default_collapsed;
     const int HEIGHTOFFSET=200;
-    const int WIDTHOFFSET=230;
+    const int WIDTHOFFSET=130;
     ToDoTag *project,*context;
     QString todofilepath;
     QWidget *taskWidget;

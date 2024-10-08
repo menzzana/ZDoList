@@ -382,11 +382,10 @@ void MainWindow::addToDo(ToDo *todo,bool firstentry) {
         }
       );
     }
-
   QString text = todo->description;
   QFont font = checkbox->font();
   QFontMetrics fm(font);
-  if ((fm.horizontalAdvance(text)+WIDTHOFFSET)<this->width())
+  if ((fm.horizontalAdvance(text)+WIDTHOFFSET)>this->width())
     this->resize(fm.horizontalAdvance(text)+WIDTHOFFSET, this->height());
   }
 //------------------------------------------------------------------------------
@@ -490,6 +489,9 @@ void MainWindow::setProject(ToDo *todo) {
       if (project==nullptr)
         project=tdt1;
       }
+    for (int i1=0; i1<nmaintodo; i1++)
+      if (maintodo[i1].project==tdt1)
+        todo->collapsed=maintodo[i1].collapsed;
     todo->project=tdt1;
     drawAllTasks();
     checkAndSaveTasks();
