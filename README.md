@@ -6,6 +6,9 @@ The main advantage is that you can drag/drop mails or copy mails from your favor
 At the moment this does although only work with **Thunderbird** but will in the future include other
 mail clients.
 
+More information and source code can be obtained at
+https://github.com/menzzana/ZDoList
+
 ## File format
 
 The software works by using todo.txt file format http://todotxt.org/
